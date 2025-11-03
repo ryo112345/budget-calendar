@@ -1,0 +1,36 @@
+services:
+  api_server:
+    container_name: budget_calendar_api
+    build:
+      context: ./api-server
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./api-server:/app
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    tty: true
+    environment:
+      - TZ=Asia/Tokyo
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=budget_calendar
+    command: air -c .air.toml
+
+  db:
+    image: mysql:8.0
+    container_name: budget_calendar_db
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: budget_calendar
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
