@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/yamao/budget-calendar/internal/models"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -28,4 +29,17 @@ func Init() {
 	}
 
 	log.Println("Database connection established")
+
+	// マイグレーション実行
+	err = DB.AutoMigrate(
+		&models.User{},
+		&models.Category{},
+		&models.Budget{},
+		&models.Transaction{},
+	)
+	if err != nil {
+		log.Fatal("Failed to migrate database:", err)
+	}
+
+	log.Println("Database migration completed")
 }
