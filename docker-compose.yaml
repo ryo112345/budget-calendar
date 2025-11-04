@@ -20,6 +20,24 @@ services:
       - DB_NAME=budget_calendar
     command: air -c .air.toml
 
+  migrations:
+    container_name: budget_calendar_migrations
+    build:
+      context: ./migrations
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./migrations:/app
+    depends_on:
+      - db
+    tty: true
+    environment:
+      - TZ=Asia/Tokyo
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=budget_calendar
+
   db:
     image: mysql:8.0
     container_name: budget_calendar_db

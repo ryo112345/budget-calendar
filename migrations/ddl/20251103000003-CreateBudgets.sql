@@ -1,0 +1,18 @@
+
+-- +migrate Up
+CREATE TABLE IF NOT EXISTS budgets(
+	id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	user_id BIGINT NOT NULL,
+	category_id BIGINT NOT NULL,
+	amount INT NOT NULL,
+	month VARCHAR(7) NOT NULL,
+	created_at DATETIME NOT NULL,
+	updated_at DATETIME NOT NULL,
+	deleted_at DATETIME,
+	INDEX idx_user_id (user_id),
+	INDEX idx_category_id (category_id),
+	INDEX idx_month (month)
+);
+
+-- +migrate Down
+DROP TABLE IF EXISTS budgets;

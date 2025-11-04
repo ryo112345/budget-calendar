@@ -1,0 +1,15 @@
+
+-- +migrate Up
+CREATE TABLE IF NOT EXISTS categories(
+	id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	user_id BIGINT NOT NULL,
+	name VARCHAR(100) NOT NULL,
+	color VARCHAR(20),
+	created_at DATETIME NOT NULL,
+	updated_at DATETIME NOT NULL,
+	deleted_at DATETIME,
+	INDEX idx_user_id (user_id)
+);
+
+-- +migrate Down
+DROP TABLE IF EXISTS categories;
