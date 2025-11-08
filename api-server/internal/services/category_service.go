@@ -1,43 +1,52 @@
 package services
 
 import (
-	"github.com/yamao/budget-calendar/database"
 	"github.com/yamao/budget-calendar/internal/models"
+	"gorm.io/gorm"
 )
 
-type CategoryService struct{}
+type CategoryService interface {
+	FetchCategoriesByUserID(userID uint) ([]models.Category, error)
+	FetchCategoryByID(id uint, userID uint) (*models.Category, error)
+	CreateCategory(category *models.Category) error
+	UpdateCategory(id uint, userID uint, updates map[string]interface{}) error
+	DeleteCategory(id uint, userID uint) error
+}
 
-// 一覧取得
-func (s *CategoryService) List(userID uint) ([]models.Category, error) {
+type categoryService struct {
+	db *gorm.DB
+}
+
+func NewCategoryService(db *gorm.DB) CategoryService {
+	return &categoryService{db}
+}
+
+func (s *categoryService) FetchCategoriesByUserID(userID uint) ([]models.Category, error) {
 	var categories []models.Category
-	err := database.DB.Where("user_id = ?", userID).Find(&categories).Error
+	err := s.db.Where("user_id = ?", userID).Find(&categories).Error
 	return categories, err
 }
 
-// 詳細取得
-func (s *CategoryService) Get(id uint, userID uint) (*models.Category, error) {
+func (s *categoryService) FetchCategoryByID(id uint, userID uint) (*models.Category, error) {
 	var category models.Category
-	err := database.DB.Where("id = ? AND user_id = ?", id, userID).First(&category).Error
+	err := s.db.Where("id = ? AND user_id = ?", id, userID).First(&category).Error
 	if err != nil {
 		return nil, err
 	}
 	return &category, nil
 }
 
-// 作成
-func (s *CategoryService) Create(category *models.Category) error {
-	return database.DB.Create(category).Error
+func (s *categoryService) CreateCategory(category *models.Category) error {
+	return s.db.Create(category).Error
 }
 
-// 更新
-func (s *CategoryService) Update(id uint, userID uint, updates map[string]interface{}) error {
-	return database.DB.Model(&models.Category{}).
+func (s *categoryService) UpdateCategory(id uint, userID uint, updates map[string]interface{}) error {
+	return s.db.Model(&models.Category{}).
 		Where("id = ? AND user_id = ?", id, userID).
 		Updates(updates).Error
 }
 
-// 削除（論理削除）
-func (s *CategoryService) Delete(id uint, userID uint) error {
-	return database.DB.Where("id = ? AND user_id = ?", id, userID).
+func (s *categoryService) DeleteCategory(id uint, userID uint) error {
+	return s.db.Where("id = ? AND user_id = ?", id, userID).
 		Delete(&models.Category{}).Error
 }
