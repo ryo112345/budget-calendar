@@ -1,0 +1,308 @@
+openapi: 3.1.0
+info:
+  title: Budget Calendar API
+  version: '1.0'
+  description: Budget Calendar APIs
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /categories:
+    get:
+      summary: Get Categories
+      tags:
+        - categories
+      responses:
+        '200':
+          $ref: '#/components/responses/FetchCategoryListsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      operationId: get-categories
+      description: ユーザーに紐づくカテゴリ一覧を取得
+    post:
+      summary: Create Category
+      tags:
+        - categories
+      responses:
+        '201':
+          $ref: '#/components/responses/CreateCategoryResponse'
+        '400':
+          $ref: '#/components/responses/CreateCategoryBadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      operationId: post-categories
+      description: 新しいカテゴリを作成
+      requestBody:
+        $ref: '#/components/requestBodies/CreateCategoryInput'
+  /categories/{id}:
+    parameters:
+      - schema:
+          type: integer
+        name: id
+        in: path
+        required: true
+        description: カテゴリID
+    get:
+      summary: Get Category
+      tags:
+        - categories
+      responses:
+        '200':
+          $ref: '#/components/responses/FetchCategoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '404':
+          $ref: '#/components/responses/CategoryNotFoundResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      operationId: get-categories-id
+      description: カテゴリの詳細を取得
+    patch:
+      summary: Update Category
+      tags:
+        - categories
+      responses:
+        '200':
+          $ref: '#/components/responses/UpdateCategoryResponse'
+        '400':
+          $ref: '#/components/responses/UpdateCategoryBadRequestResponse'
+        '404':
+          $ref: '#/components/responses/CategoryNotFoundResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      operationId: patch-categories-id
+      description: カテゴリを更新（部分更新）
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateCategoryInput'
+    delete:
+      summary: Delete Category
+      tags:
+        - categories
+      responses:
+        '204':
+          $ref: '#/components/responses/DeleteCategoryResponse'
+        '404':
+          $ref: '#/components/responses/CategoryNotFoundResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      operationId: delete-categories-id
+      description: カテゴリを削除
+components:
+  schemas:
+    Category:
+      title: Category
+      type: object
+      description: Category
+      required:
+        - id
+        - user_id
+        - name
+        - color
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          description: カテゴリID
+        user_id:
+          type: integer
+          description: ユーザーID
+        name:
+          type: string
+          maxLength: 100
+          description: カテゴリ名
+        color:
+          type: string
+          maxLength: 20
+          description: カテゴリの色
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新日時
+    CategoryLists:
+      title: CategoryLists
+      type: object
+      required:
+        - categories
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+      description: Category Lists
+    CreateCategoryValidationError:
+      title: CreateCategoryValidationError
+      type: object
+      properties:
+        name:
+          type: array
+          items:
+            type: string
+        color:
+          type: array
+          items:
+            type: string
+    UpdateCategoryValidationError:
+      title: UpdateCategoryValidationError
+      type: object
+      properties:
+        name:
+          type: array
+          items:
+            type: string
+        color:
+          type: array
+          items:
+            type: string
+  requestBodies:
+    CreateCategoryInput:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - name
+              - color
+            properties:
+              name:
+                type: string
+                maxLength: 100
+                description: カテゴリ名
+              color:
+                type: string
+                maxLength: 20
+                description: カテゴリの色
+      description: Create Category Input
+    UpdateCategoryInput:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                maxLength: 100
+                description: カテゴリ名
+              color:
+                type: string
+                maxLength: 20
+                description: カテゴリの色
+      description: Update Category Input (partial update)
+  responses:
+    FetchCategoryListsResponse:
+      description: Fetch Category Lists Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CategoryLists'
+    FetchCategoryResponse:
+      description: Fetch Category Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Category'
+    CreateCategoryResponse:
+      description: Create Category Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Category'
+    UpdateCategoryResponse:
+      description: Update Category Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Category'
+    DeleteCategoryResponse:
+      description: Delete Category Response (No Content)
+    CreateCategoryBadRequestResponse:
+      description: Create Category Bad Request Response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - errors
+            properties:
+              errors:
+                $ref: '#/components/schemas/CreateCategoryValidationError'
+    UpdateCategoryBadRequestResponse:
+      description: Update Category Bad Request Response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - errors
+            properties:
+              errors:
+                $ref: '#/components/schemas/UpdateCategoryValidationError'
+    CategoryNotFoundResponse:
+      description: Category Not Found Response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - error
+            properties:
+              error:
+                type: object
+                required:
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: string
+                    example: CATEGORY_NOT_FOUND
+                  message:
+                    type: string
+                    example: カテゴリが見つかりません
+    BadRequestResponse:
+      description: Bad Request Response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - error
+            properties:
+              error:
+                type: object
+                required:
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: string
+                    example: BAD_REQUEST
+                  message:
+                    type: string
+                    example: リクエストが不正です
+    InternalServerErrorResponse:
+      description: Internal Server Error Response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - error
+            properties:
+              error:
+                type: object
+                required:
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: string
+                    example: INTERNAL_SERVER_ERROR
+                  message:
+                    type: string
+                    example: サーバーエラーが発生しました
+tags:
+  - name: categories
+    description: categories endpoint
