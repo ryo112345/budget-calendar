@@ -5,6 +5,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	api "github.com/yamao/budget-calendar/apis"
 	"github.com/yamao/budget-calendar/database"
 	"github.com/yamao/budget-calendar/internal/handlers"
 	"github.com/yamao/budget-calendar/internal/services"
@@ -26,11 +27,8 @@ func main() {
 	categoryService := services.NewCategoryService(database.DB)
 	categoryHandler := handlers.NewCategoriesHandler(categoryService)
 
-	e.GET("/categories", categoryHandler.FetchList)
-	e.GET("/categories/:id", categoryHandler.FetchDetail)
-	e.POST("/categories", categoryHandler.Create)
-	e.PUT("/categories/:id", categoryHandler.Update)
-	e.DELETE("/categories/:id", categoryHandler.Delete)
+	// OpenAPI仕様に基づいたルーティングを登録
+	api.RegisterHandlers(e, categoryHandler)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

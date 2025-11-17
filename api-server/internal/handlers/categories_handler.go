@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/labstack/echo/v4"
+	api "github.com/yamao/budget-calendar/apis"
 	"github.com/yamao/budget-calendar/internal/models"
 	"github.com/yamao/budget-calendar/internal/services"
 )
@@ -17,52 +17,49 @@ func NewCategoriesHandler(service services.CategoryService) *CategoriesHandler {
 	return &CategoriesHandler{service: service}
 }
 
-func (h *CategoriesHandler) FetchList(c echo.Context) error {
-	userID := uint(1)
+// GetCategories implements api.ServerInterface
+func (h *CategoriesHandler) GetCategories(ctx echo.Context) error {
+	userID := uint(1) // TODO: 認証から取得
 
 	categories, err := h.service.FetchCategoriesByUserID(userID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": err.Error(),
+		return ctx.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"error": map[string]string{
+				"code":    "INTERNAL_SERVER_ERROR",
+				"message": "サーバーエラーが発生しました",
+			},
 		})
 	}
 
-	return c.JSON(http.StatusOK, categories)
+	apiCategories := make([]api.Category, len(categories))
+	for i, cat := range categories {
+		apiCategories[i] = api.Category{
+			Id:        int32(cat.ID),
+			UserId:    int32(cat.UserID),
+			Name:      cat.Name,
+			Color:     cat.Color,
+			CreatedAt: cat.CreatedAt,
+			UpdatedAt: cat.UpdatedAt,
+		}
+	}
+
+	return ctx.JSON(http.StatusOK, api.FetchCategoryListsResponse{
+		Categories: apiCategories,
+	})
 }
 
-func (h *CategoriesHandler) FetchDetail(c echo.Context) error {
-	userID := uint(1)
+// PostCategories implements api.ServerInterface
+func (h *CategoriesHandler) PostCategories(ctx echo.Context) error {
+	userID := uint(1) // TODO: 認証から取得
 
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Invalid ID",
+	var req api.CreateCategoryInput
+	if err := ctx.Bind(&req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
+			"errors": map[string][]string{},
 		})
 	}
 
-	category, err := h.service.FetchCategoryByID(uint(id), userID)
-	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{
-			"error": "Category not found",
-		})
-	}
-
-	return c.JSON(http.StatusOK, category)
-}
-
-func (h *CategoriesHandler) Create(c echo.Context) error {
-	userID := uint(1)
-
-	var req struct {
-		Name  string `json:"name"`
-		Color string `json:"color"`
-	}
-
-	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Invalid request",
-		})
-	}
+	// TODO: バリデーション
 
 	category := &models.Category{
 		UserID: userID,
@@ -71,34 +68,64 @@ func (h *CategoriesHandler) Create(c echo.Context) error {
 	}
 
 	if err := h.service.CreateCategory(category); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": err.Error(),
+		return ctx.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"error": map[string]string{
+				"code":    "INTERNAL_SERVER_ERROR",
+				"message": "サーバーエラーが発生しました",
+			},
 		})
 	}
 
-	return c.JSON(http.StatusCreated, category)
+	return ctx.JSON(http.StatusCreated, api.CreateCategoryResponse{
+		Category: api.Category{
+			Id:        int32(category.ID),
+			UserId:    int32(category.UserID),
+			Name:      category.Name,
+			Color:     category.Color,
+			CreatedAt: category.CreatedAt,
+			UpdatedAt: category.UpdatedAt,
+		},
+	})
 }
 
-func (h *CategoriesHandler) Update(c echo.Context) error {
-	userID := uint(1)
+// GetCategoriesId implements api.ServerInterface
+func (h *CategoriesHandler) GetCategoriesId(ctx echo.Context, id int32) error {
+	userID := uint(1) // TODO: 認証から取得
 
-	id, err := strconv.Atoi(c.Param("id"))
+	category, err := h.service.FetchCategoryByID(uint(id), userID)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Invalid ID",
+		return ctx.JSON(http.StatusNotFound, map[string]interface{}{
+			"error": map[string]string{
+				"code":    "CATEGORY_NOT_FOUND",
+				"message": "カテゴリが見つかりません",
+			},
 		})
 	}
 
-	var req struct {
-		Name  *string `json:"name"`
-		Color *string `json:"color"`
-	}
+	return ctx.JSON(http.StatusOK, api.FetchCategoryResponse{
+		Category: api.Category{
+			Id:        int32(category.ID),
+			UserId:    int32(category.UserID),
+			Name:      category.Name,
+			Color:     category.Color,
+			CreatedAt: category.CreatedAt,
+			UpdatedAt: category.UpdatedAt,
+		},
+	})
+}
 
-	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Invalid request",
+// PatchCategoriesId implements api.ServerInterface
+func (h *CategoriesHandler) PatchCategoriesId(ctx echo.Context, id int32) error {
+	userID := uint(1) // TODO: 認証から取得
+
+	var req api.UpdateCategoryInput
+	if err := ctx.Bind(&req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
+			"errors": map[string][]string{},
 		})
 	}
+
+	// TODO: バリデーション
 
 	updates := make(map[string]interface{})
 	if req.Name != nil {
@@ -109,33 +136,49 @@ func (h *CategoriesHandler) Update(c echo.Context) error {
 	}
 
 	if err := h.service.UpdateCategory(uint(id), userID, updates); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": err.Error(),
+		return ctx.JSON(http.StatusNotFound, map[string]interface{}{
+			"error": map[string]string{
+				"code":    "CATEGORY_NOT_FOUND",
+				"message": "カテゴリが見つかりません",
+			},
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{
-		"message": "Category updated",
+	// 更新後のデータを取得
+	category, err := h.service.FetchCategoryByID(uint(id), userID)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"error": map[string]string{
+				"code":    "INTERNAL_SERVER_ERROR",
+				"message": "サーバーエラーが発生しました",
+			},
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, api.UpdateCategoryResponse{
+		Category: api.Category{
+			Id:        int32(category.ID),
+			UserId:    int32(category.UserID),
+			Name:      category.Name,
+			Color:     category.Color,
+			CreatedAt: category.CreatedAt,
+			UpdatedAt: category.UpdatedAt,
+		},
 	})
 }
 
-func (h *CategoriesHandler) Delete(c echo.Context) error {
-	userID := uint(1)
-
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Invalid ID",
-		})
-	}
+// DeleteCategoriesId implements api.ServerInterface
+func (h *CategoriesHandler) DeleteCategoriesId(ctx echo.Context, id int32) error {
+	userID := uint(1) // TODO: 認証から取得
 
 	if err := h.service.DeleteCategory(uint(id), userID); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": err.Error(),
+		return ctx.JSON(http.StatusNotFound, map[string]interface{}{
+			"error": map[string]string{
+				"code":    "CATEGORY_NOT_FOUND",
+				"message": "カテゴリが見つかりません",
+			},
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{
-		"message": "Category deleted",
-	})
+	return ctx.NoContent(http.StatusNoContent)
 }

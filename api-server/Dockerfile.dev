@@ -4,10 +4,10 @@ FROM golang:1.25-alpine
 
 WORKDIR /app
 
+RUN apk add --update make git
+
 COPY . .
 
 RUN go mod tidy && \
 	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@latest && \
 	go install github.com/air-verse/air@latest
-
-RUN apk add --update make
