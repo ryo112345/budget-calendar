@@ -5,7 +5,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	api "github.com/yamao/budget-calendar/apis"
-	"github.com/yamao/budget-calendar/internal/models"
 	"github.com/yamao/budget-calendar/internal/services"
 )
 
@@ -59,15 +58,16 @@ func (h *CategoriesHandler) PostCategories(ctx echo.Context) error {
 		})
 	}
 
-	// TODO: バリデーション
+	category, err := h.service.CreateCategory(userID, &req)
+	if err != nil {
+		// バリデーションエラーの場合
+		validationErrors := h.service.MapValidationErrors(err)
+		if len(validationErrors) > 0 {
+			return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
+				"errors": validationErrors,
+			})
+		}
 
-	category := &models.Category{
-		UserID: userID,
-		Name:   req.Name,
-		Color:  req.Color,
-	}
-
-	if err := h.service.CreateCategory(category); err != nil {
 		return ctx.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"error": map[string]string{
 				"code":    "INTERNAL_SERVER_ERROR",
@@ -125,32 +125,20 @@ func (h *CategoriesHandler) PatchCategoriesId(ctx echo.Context, id int32) error 
 		})
 	}
 
-	// TODO: バリデーション
+	category, err := h.service.UpdateCategory(uint(id), userID, &req)
+	if err != nil {
+		// バリデーションエラーの場合
+		validationErrors := h.service.MapValidationErrors(err)
+		if len(validationErrors) > 0 {
+			return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
+				"errors": validationErrors,
+			})
+		}
 
-	updates := make(map[string]interface{})
-	if req.Name != nil {
-		updates["name"] = *req.Name
-	}
-	if req.Color != nil {
-		updates["color"] = *req.Color
-	}
-
-	if err := h.service.UpdateCategory(uint(id), userID, updates); err != nil {
 		return ctx.JSON(http.StatusNotFound, map[string]interface{}{
 			"error": map[string]string{
 				"code":    "CATEGORY_NOT_FOUND",
 				"message": "カテゴリが見つかりません",
-			},
-		})
-	}
-
-	// 更新後のデータを取得
-	category, err := h.service.FetchCategoryByID(uint(id), userID)
-	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": map[string]string{
-				"code":    "INTERNAL_SERVER_ERROR",
-				"message": "サーバーエラーが発生しました",
 			},
 		})
 	}
