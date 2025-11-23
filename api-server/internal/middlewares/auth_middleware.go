@@ -13,7 +13,12 @@ import (
 
 func AuthMiddleware(f api.StrictHandlerFunc, operationID string) api.StrictHandlerFunc {
 	return func(ctx echo.Context, i interface{}) (interface{}, error) {
-		if !needsAuthenticate(operationID) {
+		needsAuth, err := needsAuthenticate(operationID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to check authentication requirement: %w", err)
+		}
+
+		if !needsAuth {
 			// NOTE: 認証が不要なURIは認証をスキップ
 			return f(ctx, i)
 		}
@@ -42,17 +47,23 @@ func AuthMiddleware(f api.StrictHandlerFunc, operationID string) api.StrictHandl
 	}
 }
 
-func needsAuthenticate(operationID string) bool {
-	spec, _ := api.GetSwagger()
+func needsAuthenticate(operationID string) (bool, error) {
+	spec, err := api.GetSwagger()
+	if err != nil {
+		return false, fmt.Errorf("failed to get swagger spec: %w", err)
+	}
+
 	for _, pathItem := range spec.Paths.Map() {
 		for _, op := range pathItem.Operations() {
-			if op.OperationID != operationID || op.Security == nil {
-				continue
+			if op.OperationID == operationID {
+				if op.Security == nil {
+					return false, nil
+				}
+				return len(*op.Security) > 0, nil
 			}
-			return len(*op.Security) > 0
 		}
 	}
-	return false
+	return false, fmt.Errorf("operation ID '%s' not found in OpenAPI spec", operationID)
 }
 
 func newWithAuthenticateContext(token *jwt.Token, ctx echo.Context) (context.Context, error) {
