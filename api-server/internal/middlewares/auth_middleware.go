@@ -12,7 +12,7 @@ import (
 )
 
 func AuthMiddleware(f api.StrictHandlerFunc, operationID string) api.StrictHandlerFunc {
-	return func(ctx echo.Context, i interface{}) (interface{}, error) {
+	return func(ctx echo.Context, request interface{}) (response interface{}, err error) {
 		needsAuth, err := needsAuthenticate(operationID)
 		if err != nil {
 			return nil, fmt.Errorf("failed to check authentication requirement: %w", err)
@@ -20,7 +20,7 @@ func AuthMiddleware(f api.StrictHandlerFunc, operationID string) api.StrictHandl
 
 		if !needsAuth {
 			// NOTE: 認証が不要なURIは認証をスキップ
-			return f(ctx, i)
+			return f(ctx, request)
 		}
 
 		// NOTE: Cookieからtokenを取得し、JWTの復号
@@ -43,7 +43,7 @@ func AuthMiddleware(f api.StrictHandlerFunc, operationID string) api.StrictHandl
 		}
 
 		ctx.SetRequest(ctx.Request().WithContext(c))
-		return f(ctx, i)
+		return f(ctx, request)
 	}
 }
 
