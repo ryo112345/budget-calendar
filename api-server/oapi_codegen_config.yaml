@@ -1,5 +1,5 @@
 generate:
   echo-server: true
   models: true
-  strict-server: false
+  strict-server: true
   embedded-spec: true
