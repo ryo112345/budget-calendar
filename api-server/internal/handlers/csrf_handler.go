@@ -20,11 +20,19 @@ func NewCsrfHandler() CsrfHandler {
 func (ch *csrfHandler) GetCsrf(ctx context.Context, request api.GetCsrfRequestObject) (api.GetCsrfResponseObject, error) {
 	csrfToken, ok := ctx.Value(middleware.DefaultCSRFConfig.ContextKey).(string)
 	if !ok {
-		return api.GetCsrf500ApplicationProblemPlusJSONResponse{
-			Type:   "https://example.com/errors/csrf-token-error",
-			Title:  "CSRF Token Error",
-			Status: 500,
-			Detail: "CSRFトークンの取得に失敗しました",
+		return api.GetCsrf500JSONResponse{
+			Error: api.ErrorResponse{
+				Code:    500,
+				Message: "CSRFトークンの取得に失敗しました",
+				Status:  "INTERNAL",
+				Details: &[]api.ErrorInfo{
+					{
+						Type:   api.TypeGoogleapisComgoogleRpcErrorInfo,
+						Reason: "CSRF_TOKEN_ERROR",
+						Domain: "budget-calendar.example.com",
+					},
+				},
+			},
 		}, nil
 	}
 

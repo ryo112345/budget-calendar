@@ -24,7 +24,9 @@ namespace BudgetCalendarService.User {
     post(
       @body body: SignUpInput
     ): SuccessResponse<UserSignUpResponse>
-      | InternalServerErrorResponse;
+      | ErrorBadRequestResponse
+      | ErrorConflictResponse
+      | ErrorInternalServerErrorResponse;
   }
 
   @route("/signIn")
@@ -35,13 +37,19 @@ namespace BudgetCalendarService.User {
     @post
     post(
       @body body: SignInInput
-    ): SuccessResponse<UserSignInOkResponse>
-      | BadRequestErrorResponse<SignInBadRequestResponse>
-      | InternalServerErrorResponse;
+    ): {
+      @statusCode status: 200;
+      @header setCookie?: string;
+      @body body: UserSignInOkResponse;
+    }
+      | ErrorBadRequestResponse
+      | ErrorUnauthorizedResponse
+      | ErrorInternalServerErrorResponse;
   }
 
   @route("/checkSignedIn")
   interface CheckSignedIn {
+    @useAuth([SecuritySchema])
     @operationId("get-users-check-signed-in")
     @summary("User CheckSignedIn")
     @doc("ログイン状態確認")

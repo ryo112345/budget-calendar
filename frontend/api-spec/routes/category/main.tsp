@@ -14,6 +14,7 @@ using OpenAPI;
 
 @tag("categories")
 @route("/categories")
+@useAuth([SecuritySchema])
 namespace BudgetCalendarService.Category {
   interface Root {
     @operationId("get-categories")
@@ -21,7 +22,7 @@ namespace BudgetCalendarService.Category {
     @doc("ユーザーに紐づくカテゴリ一覧を取得")
     @get
     get(): SuccessResponse<FetchCategoryListsResponse>
-      | InternalServerErrorWithCodeResponse;
+      | ErrorInternalServerErrorResponse;
 
     @operationId("post-categories")
     @summary("Create Category")
@@ -30,8 +31,8 @@ namespace BudgetCalendarService.Category {
     post(
       @body body: CreateCategoryInput
     ): CreatedSuccessResponse<CreateCategoryResponse>
-      | CreateCategoryBadRequestResponse
-      | InternalServerErrorWithCodeResponse;
+      | ErrorBadRequestResponse
+      | ErrorInternalServerErrorResponse;
   }
 
   @route("/{id}")
@@ -43,21 +44,21 @@ namespace BudgetCalendarService.Category {
     get(
       @path @doc("カテゴリID") id: int32
     ): SuccessResponse<FetchCategoryResponse>
-      | BadRequestWithCodeResponse
-      | CategoryNotFoundErrorResponse
-      | InternalServerErrorWithCodeResponse;
+      | ErrorBadRequestResponse
+      | NotFoundErrorResponse
+      | ErrorInternalServerErrorResponse;
 
     @operationId("patch-categories-id")
     @summary("Update Category")
     @doc("カテゴリを更新（部分更新）")
-    @patch
+    @patch(#{implicitOptionality: true})
     patch(
       @path @doc("カテゴリID") id: int32,
       @body body: UpdateCategoryInput
     ): SuccessResponse<UpdateCategoryResponse>
-      | UpdateCategoryBadRequestResponse
-      | CategoryNotFoundErrorResponse
-      | InternalServerErrorWithCodeResponse;
+      | ErrorBadRequestResponse
+      | NotFoundErrorResponse
+      | ErrorInternalServerErrorResponse;
 
     @operationId("delete-categories-id")
     @summary("Delete Category")
@@ -66,7 +67,7 @@ namespace BudgetCalendarService.Category {
     delete(
       @path @doc("カテゴリID") id: int32
     ): NoContentSuccessResponse
-      | CategoryNotFoundErrorResponse
-      | InternalServerErrorWithCodeResponse;
+      | NotFoundErrorResponse
+      | ErrorInternalServerErrorResponse;
   }
 }

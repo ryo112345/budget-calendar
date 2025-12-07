@@ -16,20 +16,8 @@ model NoContentSuccessResponse {
   @statusCode status: 204;
 }
 
-model BadRequestErrorResponse<T> {
-  @statusCode status: 400;
-  @body body: T;
-}
-
 model NotFoundErrorResponse {
   @statusCode status: 404;
-  @body body: {
-    message: string;
-  };
-}
-
-model InternalServerErrorResponse {
-  @statusCode status: 500;
   @body body: {
     message: string;
   };

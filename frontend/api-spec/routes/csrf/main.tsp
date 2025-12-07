@@ -19,6 +19,6 @@ namespace BudgetCalendarService.Csrf {
     @doc("CSRFトークンを取得（認証不要）")
     @get
     get(): SuccessResponse<CsrfResponse>
-      | InternalServerErrorWithCodeResponse;
+      | ErrorInternalServerErrorResponse;
   }
 }
