@@ -36,6 +36,7 @@ func Register(e *echo.Echo) {
 	// TODO: CSRFトークンをcontext.Contextに埋め込むミドルウェアを適用
 	//       現在は全エンドポイントに適用されているが、GET /csrf エンドポイントのみに適用すべき
 	//       StrictHandlerだとecho.Contextがhandler側で使えずのため
+	//       ただし、オーバーヘッドは軽微（context.WithValueのみ）なため、現時点で修正の優先度は低い
 	e.Use(CsrfContextMiddleware)
 
 	// NOTE: Panicが発生してもサーバを停止することを防ぐ
