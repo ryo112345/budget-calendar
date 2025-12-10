@@ -5,7 +5,7 @@ using Http;
 @doc("エラー詳細情報")
 model ErrorInfo {
   @doc("型識別子")
-  `@type`: "type.googleapis.com/google.rpc.ErrorInfo";
+  `@type`: "ErrorInfo";
 
   @doc("エラーの理由（SHORT_SNAKE_CASE形式）")
   reason: string;

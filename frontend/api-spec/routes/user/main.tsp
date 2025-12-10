@@ -40,7 +40,7 @@ namespace BudgetCalendarService.User {
     ): {
       @statusCode status: 200;
       @header setCookie?: string;
-      @body body: UserSignInOkResponse;
+      @body body: UserSignInResponse;
     }
       | ErrorBadRequestResponse
       | ErrorUnauthorizedResponse
