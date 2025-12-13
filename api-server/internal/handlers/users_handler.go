@@ -41,11 +41,11 @@ func (uh *usersHandler) PostUsersSignUp(ctx context.Context, request api.PostUse
 			Error: api.ErrorResponse{
 				Code:    400,
 				Message: "入力値に誤りがあります",
-				Status:  "INVALID_ARGUMENT",
+				Status:  api.INVALIDARGUMENT,
 				Details: &[]api.ErrorInfo{
 					{
 						Type:     api.ErrorInfoTypeErrorInfo,
-						Reason:   "VALIDATION_ERROR",
+						Reason:   api.INVALIDEMAIL,
 						Domain:   "budget-calendar.example.com",
 						Metadata: &metadata,
 					},
@@ -63,11 +63,11 @@ func (uh *usersHandler) PostUsersSignUp(ctx context.Context, request api.PostUse
 				Error: api.ErrorResponse{
 					Code:    409,
 					Message: "このメールアドレスは既に登録されています",
-					Status:  "ALREADY_EXISTS",
+					Status:  api.ALREADYEXISTS,
 					Details: &[]api.ErrorInfo{
 						{
 							Type:   api.ErrorInfoTypeErrorInfo,
-							Reason: "EMAIL_ALREADY_EXISTS",
+							Reason: api.EMAILALREADYEXISTS,
 							Domain: "budget-calendar.example.com",
 						},
 					},
@@ -80,11 +80,11 @@ func (uh *usersHandler) PostUsersSignUp(ctx context.Context, request api.PostUse
 			Error: api.ErrorResponse{
 				Code:    500,
 				Message: "サーバーエラーが発生しました",
-				Status:  "INTERNAL",
+				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{
 						Type:   api.ErrorInfoTypeErrorInfo,
-						Reason: "INTERNAL_ERROR",
+						Reason: api.UNKNOWNERROR,
 						Domain: "budget-calendar.example.com",
 					},
 				},
@@ -105,11 +105,11 @@ func (uh *usersHandler) PostUsersSignIn(ctx context.Context, request api.PostUse
 			Error: api.ErrorResponse{
 				Code:    400,
 				Message: "入力値に誤りがあります",
-				Status:  "INVALID_ARGUMENT",
+				Status:  api.INVALIDARGUMENT,
 				Details: &[]api.ErrorInfo{
 					{
 						Type:     api.ErrorInfoTypeErrorInfo,
-						Reason:   "VALIDATION_ERROR",
+						Reason:   api.INVALIDEMAIL,
 						Domain:   "budget-calendar.example.com",
 						Metadata: &metadata,
 					},
@@ -126,11 +126,11 @@ func (uh *usersHandler) PostUsersSignIn(ctx context.Context, request api.PostUse
 				Error: api.ErrorResponse{
 					Code:    401,
 					Message: "メールアドレスまたはパスワードが正しくありません",
-					Status:  "UNAUTHENTICATED",
+					Status:  api.UNAUTHENTICATED,
 					Details: &[]api.ErrorInfo{
 						{
 							Type:   api.ErrorInfoTypeErrorInfo,
-							Reason: "AUTHENTICATION_FAILED",
+							Reason: api.INVALIDCREDENTIALS,
 							Domain: "budget-calendar.example.com",
 						},
 					},
@@ -143,11 +143,11 @@ func (uh *usersHandler) PostUsersSignIn(ctx context.Context, request api.PostUse
 			Error: api.ErrorResponse{
 				Code:    500,
 				Message: "サーバーエラーが発生しました",
-				Status:  "INTERNAL",
+				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{
 						Type:   api.ErrorInfoTypeErrorInfo,
-						Reason: "INTERNAL_ERROR",
+						Reason: api.UNKNOWNERROR,
 						Domain: "budget-calendar.example.com",
 					},
 				},
