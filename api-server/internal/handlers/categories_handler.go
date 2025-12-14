@@ -1,33 +1,62 @@
 package handlers
 
 import (
-	"net/http"
+	"context"
+	"errors"
 
-	"github.com/labstack/echo/v4"
-	api "github.com/yamao/budget-calendar/apis"
-	"github.com/yamao/budget-calendar/internal/services"
+	api "apps/apis"
+	"apps/internal/helpers"
+	"apps/internal/services"
+
+	"gorm.io/gorm"
 )
 
-type CategoriesHandler struct {
+type CategoriesHandler interface {
+	// Get categories
+	// (GET /categories)
+	GetCategories(ctx context.Context, request api.GetCategoriesRequestObject) (api.GetCategoriesResponseObject, error)
+	// Create category
+	// (POST /categories)
+	PostCategories(ctx context.Context, request api.PostCategoriesRequestObject) (api.PostCategoriesResponseObject, error)
+	// Get category by ID
+	// (GET /categories/{id})
+	GetCategoriesId(ctx context.Context, request api.GetCategoriesIdRequestObject) (api.GetCategoriesIdResponseObject, error)
+	// Update category
+	// (PATCH /categories/{id})
+	PatchCategoriesId(ctx context.Context, request api.PatchCategoriesIdRequestObject) (api.PatchCategoriesIdResponseObject, error)
+	// Delete category
+	// (DELETE /categories/{id})
+	DeleteCategoriesId(ctx context.Context, request api.DeleteCategoriesIdRequestObject) (api.DeleteCategoriesIdResponseObject, error)
+}
+
+type categoriesHandler struct {
 	service services.CategoryService
 }
 
-func NewCategoriesHandler(service services.CategoryService) *CategoriesHandler {
-	return &CategoriesHandler{service: service}
+func NewCategoriesHandler(service services.CategoryService) CategoriesHandler {
+	return &categoriesHandler{service: service}
 }
 
-// GetCategories implements api.ServerInterface
-func (h *CategoriesHandler) GetCategories(ctx echo.Context) error {
-	userID := uint(1) // TODO: 認証から取得
+// GetCategories implements api.StrictServerInterface
+func (h *categoriesHandler) GetCategories(ctx context.Context, request api.GetCategoriesRequestObject) (api.GetCategoriesResponseObject, error) {
+	userID, _ := helpers.ExtractUserID(ctx)
 
 	categories, err := h.service.FetchCategoriesByUserID(userID)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": map[string]string{
-				"code":    "INTERNAL_SERVER_ERROR",
-				"message": "サーバーエラーが発生しました",
+		return api.GetCategories500JSONResponse{
+			Error: api.ErrorResponse{
+				Code:    500,
+				Message: "サーバーエラーが発生しました",
+				Status:  api.INTERNAL,
+				Details: &[]api.ErrorInfo{
+					{
+						Type:   api.ErrorInfoTypeErrorInfo,
+						Reason: api.DATABASEERROR,
+						Domain: "budget-calendar.example.com",
+					},
+				},
 			},
-		})
+		}, nil
 	}
 
 	apiCategories := make([]api.Category, len(categories))
@@ -42,41 +71,54 @@ func (h *CategoriesHandler) GetCategories(ctx echo.Context) error {
 		}
 	}
 
-	return ctx.JSON(http.StatusOK, api.FetchCategoryListsResponse{
+	return api.GetCategories200JSONResponse{
 		Categories: apiCategories,
-	})
+	}, nil
 }
 
-// PostCategories implements api.ServerInterface
-func (h *CategoriesHandler) PostCategories(ctx echo.Context) error {
-	userID := uint(1) // TODO: 認証から取得
+// PostCategories implements api.StrictServerInterface
+func (h *categoriesHandler) PostCategories(ctx context.Context, request api.PostCategoriesRequestObject) (api.PostCategoriesResponseObject, error) {
+	userID, _ := helpers.ExtractUserID(ctx)
 
-	var req api.CreateCategoryInput
-	if err := ctx.Bind(&req); err != nil {
-		return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
-			"errors": map[string][]string{},
-		})
-	}
-
-	category, err := h.service.CreateCategory(userID, &req)
+	category, err := h.service.CreateCategory(userID, request.Body)
 	if err != nil {
 		// バリデーションエラーの場合
-		validationErrors := h.service.MapValidationErrors(err)
-		if len(validationErrors) > 0 {
-			return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
-				"errors": validationErrors,
-			})
+		metadata := helpers.ValidationErrorToMetadata(err)
+		if len(metadata) > 0 {
+			return api.PostCategories400JSONResponse{
+				Error: api.ErrorResponse{
+					Code:    400,
+					Message: "入力値に誤りがあります",
+					Status:  api.INVALIDARGUMENT,
+					Details: &[]api.ErrorInfo{
+						{
+							Type:     api.ErrorInfoTypeErrorInfo,
+							Reason:   api.INVALIDCATEGORYNAME,
+							Domain:   "budget-calendar.example.com",
+							Metadata: &metadata,
+						},
+					},
+				},
+			}, nil
 		}
 
-		return ctx.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": map[string]string{
-				"code":    "INTERNAL_SERVER_ERROR",
-				"message": "サーバーエラーが発生しました",
+		return api.PostCategories500JSONResponse{
+			Error: api.ErrorResponse{
+				Code:    500,
+				Message: "サーバーエラーが発生しました",
+				Status:  api.INTERNAL,
+				Details: &[]api.ErrorInfo{
+					{
+						Type:   api.ErrorInfoTypeErrorInfo,
+						Reason: api.DATABASEERROR,
+						Domain: "budget-calendar.example.com",
+					},
+				},
 			},
-		})
+		}, nil
 	}
 
-	return ctx.JSON(http.StatusCreated, api.CreateCategoryResponse{
+	return api.PostCategories201JSONResponse{
 		Category: api.Category{
 			Id:        int32(category.ID),
 			UserId:    int32(category.UserID),
@@ -85,24 +127,21 @@ func (h *CategoriesHandler) PostCategories(ctx echo.Context) error {
 			CreatedAt: category.CreatedAt,
 			UpdatedAt: category.UpdatedAt,
 		},
-	})
+	}, nil
 }
 
-// GetCategoriesId implements api.ServerInterface
-func (h *CategoriesHandler) GetCategoriesId(ctx echo.Context, id int32) error {
-	userID := uint(1) // TODO: 認証から取得
+// GetCategoriesId implements api.StrictServerInterface
+func (h *categoriesHandler) GetCategoriesId(ctx context.Context, request api.GetCategoriesIdRequestObject) (api.GetCategoriesIdResponseObject, error) {
+	userID, _ := helpers.ExtractUserID(ctx)
 
-	category, err := h.service.FetchCategoryByID(uint(id), userID)
+	category, err := h.service.FetchCategoryByID(uint(request.Id), userID)
 	if err != nil {
-		return ctx.JSON(http.StatusNotFound, map[string]interface{}{
-			"error": map[string]string{
-				"code":    "CATEGORY_NOT_FOUND",
-				"message": "カテゴリが見つかりません",
-			},
-		})
+		return api.GetCategoriesId404JSONResponse{
+			Message: "カテゴリが見つかりません",
+		}, nil
 	}
 
-	return ctx.JSON(http.StatusOK, api.FetchCategoryResponse{
+	return api.GetCategoriesId200JSONResponse{
 		Category: api.Category{
 			Id:        int32(category.ID),
 			UserId:    int32(category.UserID),
@@ -111,39 +150,60 @@ func (h *CategoriesHandler) GetCategoriesId(ctx echo.Context, id int32) error {
 			CreatedAt: category.CreatedAt,
 			UpdatedAt: category.UpdatedAt,
 		},
-	})
+	}, nil
 }
 
-// PatchCategoriesId implements api.ServerInterface
-func (h *CategoriesHandler) PatchCategoriesId(ctx echo.Context, id int32) error {
-	userID := uint(1) // TODO: 認証から取得
+// PatchCategoriesId implements api.StrictServerInterface
+func (h *categoriesHandler) PatchCategoriesId(ctx context.Context, request api.PatchCategoriesIdRequestObject) (api.PatchCategoriesIdResponseObject, error) {
+	userID, _ := helpers.ExtractUserID(ctx)
 
-	var req api.UpdateCategoryInput
-	if err := ctx.Bind(&req); err != nil {
-		return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
-			"errors": map[string][]string{},
-		})
-	}
-
-	category, err := h.service.UpdateCategory(uint(id), userID, &req)
+	category, err := h.service.UpdateCategory(uint(request.Id), userID, request.Body)
 	if err != nil {
 		// バリデーションエラーの場合
-		validationErrors := h.service.MapValidationErrors(err)
-		if len(validationErrors) > 0 {
-			return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
-				"errors": validationErrors,
-			})
+		metadata := helpers.ValidationErrorToMetadata(err)
+		if len(metadata) > 0 {
+			return api.PatchCategoriesId400JSONResponse{
+				Error: api.ErrorResponse{
+					Code:    400,
+					Message: "入力値に誤りがあります",
+					Status:  api.INVALIDARGUMENT,
+					Details: &[]api.ErrorInfo{
+						{
+							Type:     api.ErrorInfoTypeErrorInfo,
+							Reason:   api.INVALIDCATEGORYNAME,
+							Domain:   "budget-calendar.example.com",
+							Metadata: &metadata,
+						},
+					},
+				},
+			}, nil
 		}
 
-		return ctx.JSON(http.StatusNotFound, map[string]interface{}{
-			"error": map[string]string{
-				"code":    "CATEGORY_NOT_FOUND",
-				"message": "カテゴリが見つかりません",
+		// カテゴリが見つからない場合
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return api.PatchCategoriesId404JSONResponse{
+				Message: "カテゴリが見つかりません",
+			}, nil
+		}
+
+		// その他のエラー（データベースエラーなど）
+		return api.PatchCategoriesId500JSONResponse{
+			Error: api.ErrorResponse{
+				Code:    500,
+				Message: "サーバーエラーが発生しました",
+				Status:  api.INTERNAL,
+				Details: &[]api.ErrorInfo{
+					{
+						Type:   api.ErrorInfoTypeErrorInfo,
+						Reason: api.DATABASEERROR,
+						Domain: "budget-calendar.example.com",
+					},
+				},
 			},
-		})
+		}, nil
 	}
 
-	return ctx.JSON(http.StatusOK, api.UpdateCategoryResponse{
+	return api.PatchCategoriesId200JSONResponse{
 		Category: api.Category{
 			Id:        int32(category.ID),
 			UserId:    int32(category.UserID),
@@ -152,21 +212,38 @@ func (h *CategoriesHandler) PatchCategoriesId(ctx echo.Context, id int32) error 
 			CreatedAt: category.CreatedAt,
 			UpdatedAt: category.UpdatedAt,
 		},
-	})
+	}, nil
 }
 
-// DeleteCategoriesId implements api.ServerInterface
-func (h *CategoriesHandler) DeleteCategoriesId(ctx echo.Context, id int32) error {
-	userID := uint(1) // TODO: 認証から取得
+// DeleteCategoriesId implements api.StrictServerInterface
+func (h *categoriesHandler) DeleteCategoriesId(ctx context.Context, request api.DeleteCategoriesIdRequestObject) (api.DeleteCategoriesIdResponseObject, error) {
+	userID, _ := helpers.ExtractUserID(ctx)
 
-	if err := h.service.DeleteCategory(uint(id), userID); err != nil {
-		return ctx.JSON(http.StatusNotFound, map[string]interface{}{
-			"error": map[string]string{
-				"code":    "CATEGORY_NOT_FOUND",
-				"message": "カテゴリが見つかりません",
+	if err := h.service.DeleteCategory(uint(request.Id), userID); err != nil {
+		// カテゴリが見つからない場合
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return api.DeleteCategoriesId404JSONResponse{
+				Message: "カテゴリが見つかりません",
+			}, nil
+		}
+
+		// その他のエラー（データベースエラーなど）
+		return api.DeleteCategoriesId500JSONResponse{
+			Error: api.ErrorResponse{
+				Code:    500,
+				Message: "サーバーエラーが発生しました",
+				Status:  api.INTERNAL,
+				Details: &[]api.ErrorInfo{
+					{
+						Type:   api.ErrorInfoTypeErrorInfo,
+						Reason: api.DATABASEERROR,
+						Domain: "budget-calendar.example.com",
+					},
+				},
 			},
-		})
+		}, nil
 	}
 
-	return ctx.NoContent(http.StatusNoContent)
+	return api.DeleteCategoriesId204Response{}, nil
 }
+

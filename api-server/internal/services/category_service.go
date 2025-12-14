@@ -1,11 +1,10 @@
 package services
 
 import (
-	api "github.com/yamao/budget-calendar/apis"
-	"github.com/yamao/budget-calendar/internal/models"
-	"github.com/yamao/budget-calendar/internal/validators"
+	api "apps/apis"
+	"apps/internal/models"
+	"apps/internal/validators"
 
-	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"gorm.io/gorm"
 )
 
@@ -15,7 +14,6 @@ type CategoryService interface {
 	CreateCategory(userID uint, input *api.CreateCategoryInput) (*models.Category, error)
 	UpdateCategory(id uint, userID uint, input *api.UpdateCategoryInput) (*models.Category, error)
 	DeleteCategory(id uint, userID uint) error
-	MapValidationErrors(err error) map[string][]string
 }
 
 type categoryService struct {
@@ -85,21 +83,12 @@ func (s *categoryService) UpdateCategory(id uint, userID uint, input *api.Update
 }
 
 func (s *categoryService) DeleteCategory(id uint, userID uint) error {
-	return s.db.Where("id = ? AND user_id = ?", id, userID).
-		Delete(&models.Category{}).Error
-}
-
-func (s *categoryService) MapValidationErrors(err error) map[string][]string {
-	result := make(map[string][]string)
-	if err == nil {
-		return result
+	result := s.db.Where("id = ? AND user_id = ?", id, userID).Delete(&models.Category{})
+	if result.Error != nil {
+		return result.Error
 	}
-
-	if errors, ok := err.(validation.Errors); ok {
-		for field, errorMessage := range errors {
-			result[field] = []string{errorMessage.Error()}
-		}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
 	}
-
-	return result
+	return nil
 }

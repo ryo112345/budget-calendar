@@ -24,11 +24,11 @@ func (ch *csrfHandler) GetCsrf(ctx context.Context, request api.GetCsrfRequestOb
 			Error: api.ErrorResponse{
 				Code:    500,
 				Message: "CSRFトークンの取得に失敗しました",
-				Status:  "INTERNAL",
+				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{
-						Type:   api.TypeGoogleapisComgoogleRpcErrorInfo,
-						Reason: "CSRF_TOKEN_ERROR",
+						Type:   api.ErrorInfoTypeErrorInfo,
+						Reason: api.UNKNOWNERROR,
 						Domain: "budget-calendar.example.com",
 					},
 				},

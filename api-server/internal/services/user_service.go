@@ -8,6 +8,7 @@ import (
 
 	api "apps/apis"
 	"apps/internal/models"
+	"apps/internal/validators"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -35,6 +36,11 @@ func NewUserService(db *gorm.DB) UserService {
 
 // SignUp - 会員登録
 func (us *userService) SignUp(input *api.UserSignUpInput) error {
+	// バリデーション
+	if err := validators.ValidateSignUp(input); err != nil {
+		return err
+	}
+
 	var count int64
 	if err := us.db.Model(&models.User{}).Where("email = ?", input.Email).Count(&count).Error; err != nil {
 		return err
@@ -63,6 +69,11 @@ func (us *userService) SignUp(input *api.UserSignUpInput) error {
 
 // SignIn - ログイン
 func (us *userService) SignIn(input *api.UserSignInInput) (string, error) {
+	// バリデーション
+	if err := validators.ValidateSignIn(input); err != nil {
+		return "", err
+	}
+
 	var user models.User
 	if err := us.db.Where("email = ?", input.Email).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

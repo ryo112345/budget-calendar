@@ -4,13 +4,10 @@ import (
 	api "apps/apis"
 	"apps/internal/helpers"
 	"apps/internal/services"
-	"apps/internal/validators"
 	"context"
 	"errors"
 	"net/http"
 	"os"
-
-	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 type UsersHandler interface {
@@ -34,29 +31,29 @@ func NewUsersHandler(userService services.UserService) UsersHandler {
 }
 
 func (uh *usersHandler) PostUsersSignUp(ctx context.Context, request api.PostUsersSignUpRequestObject) (api.PostUsersSignUpResponseObject, error) {
-	// バリデーション
-	if err := validators.ValidateSignUp(request.Body); err != nil {
-		metadata := uh.validationErrorToMetadata(err)
-		return api.PostUsersSignUp400JSONResponse{
-			Error: api.ErrorResponse{
-				Code:    400,
-				Message: "入力値に誤りがあります",
-				Status:  api.INVALIDARGUMENT,
-				Details: &[]api.ErrorInfo{
-					{
-						Type:     api.ErrorInfoTypeErrorInfo,
-						Reason:   api.INVALIDEMAIL,
-						Domain:   "budget-calendar.example.com",
-						Metadata: &metadata,
-					},
-				},
-			},
-		}, nil
-	}
-
-	// サービス層でビジネスロジック実行
+	// サービス層でビジネスロジック実行（バリデーション含む）
 	signUpErr := uh.userService.SignUp(request.Body)
 	if signUpErr != nil {
+		// バリデーションエラーの場合
+		metadata := helpers.ValidationErrorToMetadata(signUpErr)
+		if len(metadata) > 0 {
+			return api.PostUsersSignUp400JSONResponse{
+				Error: api.ErrorResponse{
+					Code:    400,
+					Message: "入力値に誤りがあります",
+					Status:  api.INVALIDARGUMENT,
+					Details: &[]api.ErrorInfo{
+						{
+							Type:     api.ErrorInfoTypeErrorInfo,
+							Reason:   api.INVALIDEMAIL,
+							Domain:   "budget-calendar.example.com",
+							Metadata: &metadata,
+						},
+					},
+				},
+			}, nil
+		}
+
 		// メール重複エラーの場合
 		if errors.Is(signUpErr, services.ErrEmailAlreadyExists) {
 			return api.PostUsersSignUp409JSONResponse{
@@ -98,28 +95,28 @@ func (uh *usersHandler) PostUsersSignUp(ctx context.Context, request api.PostUse
 }
 
 func (uh *usersHandler) PostUsersSignIn(ctx context.Context, request api.PostUsersSignInRequestObject) (api.PostUsersSignInResponseObject, error) {
-	// バリデーション
-	if err := validators.ValidateSignIn(request.Body); err != nil {
-		metadata := uh.validationErrorToMetadata(err)
-		return api.PostUsersSignIn400JSONResponse{
-			Error: api.ErrorResponse{
-				Code:    400,
-				Message: "入力値に誤りがあります",
-				Status:  api.INVALIDARGUMENT,
-				Details: &[]api.ErrorInfo{
-					{
-						Type:     api.ErrorInfoTypeErrorInfo,
-						Reason:   api.INVALIDEMAIL,
-						Domain:   "budget-calendar.example.com",
-						Metadata: &metadata,
-					},
-				},
-			},
-		}, nil
-	}
-
 	tokenString, err := uh.userService.SignIn(request.Body)
 	if err != nil {
+		// バリデーションエラーの場合
+		metadata := helpers.ValidationErrorToMetadata(err)
+		if len(metadata) > 0 {
+			return api.PostUsersSignIn400JSONResponse{
+				Error: api.ErrorResponse{
+					Code:    400,
+					Message: "入力値に誤りがあります",
+					Status:  api.INVALIDARGUMENT,
+					Details: &[]api.ErrorInfo{
+						{
+							Type:     api.ErrorInfoTypeErrorInfo,
+							Reason:   api.INVALIDEMAIL,
+							Domain:   "budget-calendar.example.com",
+							Metadata: &metadata,
+						},
+					},
+				},
+			}, nil
+		}
+
 		// 認証エラー
 		if errors.Is(err, services.ErrAuthenticationFailed) {
 			return api.PostUsersSignIn401JSONResponse{
@@ -188,18 +185,4 @@ func (uh *usersHandler) GetUsersCheckSignedIn(ctx context.Context, request api.G
 	return api.GetUsersCheckSignedIn200JSONResponse{
 		IsSignedIn: uh.userService.ExistsUser(userID),
 	}, nil
-}
-
-func (uh *usersHandler) validationErrorToMetadata(err error) map[string]string {
-	metadata := make(map[string]string)
-	if err == nil {
-		return metadata
-	}
-
-	if errors, ok := err.(validation.Errors); ok {
-		for field, err := range errors {
-			metadata[field] = err.Error()
-		}
-	}
-	return metadata
 }

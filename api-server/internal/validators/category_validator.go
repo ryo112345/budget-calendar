@@ -1,7 +1,7 @@
 package validators
 
 import (
-	api "github.com/yamao/budget-calendar/apis"
+	api "apps/apis"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
