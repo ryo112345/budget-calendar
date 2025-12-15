@@ -51,6 +51,19 @@ enum ErrorReason {
   @doc("無効なカテゴリ色 - 推奨メッセージ: カラーコードを正しく入力してください")
   INVALID_CATEGORY_COLOR: "INVALID_CATEGORY_COLOR",
 
+  // Transaction関連
+  @doc("取引が見つからない - 推奨メッセージ: 取引が見つかりません")
+  TRANSACTION_NOT_FOUND: "TRANSACTION_NOT_FOUND",
+
+  @doc("無効な取引タイプ - 推奨メッセージ: 取引タイプはincomeまたはexpenseを指定してください")
+  INVALID_TRANSACTION_TYPE: "INVALID_TRANSACTION_TYPE",
+
+  @doc("無効な金額 - 推奨メッセージ: 金額は1以上の数値を入力してください")
+  INVALID_AMOUNT: "INVALID_AMOUNT",
+
+  @doc("無効な日付 - 推奨メッセージ: 日付を正しく入力してください")
+  INVALID_DATE: "INVALID_DATE",
+
   // その他
   @doc("データベースエラー - 推奨メッセージ: サーバーエラーが発生しました")
   DATABASE_ERROR: "DATABASE_ERROR",
