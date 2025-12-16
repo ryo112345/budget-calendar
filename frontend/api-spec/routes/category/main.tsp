@@ -4,7 +4,6 @@ import "@typespec/openapi3";
 
 import "./request.tsp";
 import "./response.tsp";
-import "./error.tsp";
 
 import "../common";
 import "../common/error.tsp";
