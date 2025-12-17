@@ -44,17 +44,17 @@ func (s *categoryService) CreateCategory(userID uint, input *api.CreateCategoryI
 		return nil, err
 	}
 
-	category := &models.Category{
+	category := models.Category{
 		UserID: userID,
 		Name:   input.Name,
 		Color:  input.Color,
 	}
 
-	if err := s.db.Create(category).Error; err != nil {
+	if err := s.db.Create(&category).Error; err != nil {
 		return nil, err
 	}
 
-	return category, nil
+	return &category, nil
 }
 
 func (s *categoryService) UpdateCategory(id uint, userID uint, input *api.UpdateCategoryInput) (*models.Category, error) {
