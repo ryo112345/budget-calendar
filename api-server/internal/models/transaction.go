@@ -15,9 +15,10 @@ const (
 
 type Transaction struct {
 	ID          uint            `gorm:"primaryKey" json:"id"`
-	UserID      uint            `json:"user_id"`
-	CategoryID  uint            `json:"category_id"`
-	Category    Category        `gorm:"foreignKey:CategoryID" json:"category"`
+	UserID      uint            `gorm:"not null;index" json:"user_id"`
+	User        User            `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"-"`
+	CategoryID  uint            `gorm:"not null;index" json:"category_id"`
+	Category    Category        `gorm:"foreignKey:CategoryID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT" json:"category"`
 	Type        TransactionType `gorm:"size:10;not null" json:"type"`
 	Amount      int             `gorm:"not null" json:"amount"`
 	Date        time.Time       `gorm:"not null" json:"date"`
