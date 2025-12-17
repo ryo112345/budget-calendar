@@ -29,7 +29,6 @@ func (s *transactionService) FetchTransactions(userID uint, params *api.GetTrans
 
 	query := s.db.Preload("Category").Where("user_id = ?", userID)
 
-	// フィルタリング条件を適用
 	if params != nil {
 		if params.StartDate != nil {
 			query = query.Where("date >= ?", params.StartDate.Time)
@@ -63,7 +62,6 @@ func (s *transactionService) CreateTransaction(userID uint, input *api.CreateTra
 		return nil, err
 	}
 
-	// カテゴリの存在確認
 	var category models.Category
 	if err := s.db.Where("id = ? AND user_id = ?", input.CategoryId, userID).First(&category).Error; err != nil {
 		return nil, err
@@ -87,7 +85,6 @@ func (s *transactionService) CreateTransaction(userID uint, input *api.CreateTra
 		return nil, err
 	}
 
-	// Categoryをプリロードして返す
 	if err := s.db.Preload("Category").First(&transaction, transaction.ID).Error; err != nil {
 		return nil, err
 	}
@@ -100,7 +97,6 @@ func (s *transactionService) UpdateTransaction(id uint, userID uint, input *api.
 		return nil, err
 	}
 
-	// 更新対象が存在するか確認
 	var existing models.Transaction
 	if err := s.db.Where("id = ? AND user_id = ?", id, userID).First(&existing).Error; err != nil {
 		return nil, err
@@ -109,7 +105,6 @@ func (s *transactionService) UpdateTransaction(id uint, userID uint, input *api.
 	updates := make(map[string]interface{})
 
 	if input.CategoryId != nil {
-		// カテゴリの存在確認
 		var category models.Category
 		if err := s.db.Where("id = ? AND user_id = ?", *input.CategoryId, userID).First(&category).Error; err != nil {
 			return nil, err

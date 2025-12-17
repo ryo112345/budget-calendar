@@ -43,7 +43,6 @@ func ValidateCreateTransaction(input *api.CreateTransactionInput) error {
 }
 
 func ValidateUpdateTransaction(input *api.UpdateTransactionInput) error {
-	// 少なくとも1つはフィールドが必要
 	if input.CategoryId == nil &&
 		input.Type == nil &&
 		input.Amount == nil &&
@@ -52,28 +51,24 @@ func ValidateUpdateTransaction(input *api.UpdateTransactionInput) error {
 		return validation.NewError("no_fields", "更新するフィールドを1つ以上指定してください")
 	}
 
-	// CategoryIdの検証
 	if input.CategoryId != nil {
 		if err := validation.Validate(*input.CategoryId, validation.Min(1).Error("カテゴリIDは1以上で入力してください")); err != nil {
 			return err
 		}
 	}
 
-	// Typeの検証
 	if input.Type != nil {
 		if err := validation.Validate(*input.Type, validation.In(api.Income, api.Expense).Error("取引タイプはincomeまたはexpenseを指定してください")); err != nil {
 			return err
 		}
 	}
 
-	// Amountの検証
 	if input.Amount != nil {
 		if err := validation.Validate(*input.Amount, validation.Min(1).Error("金額は1以上で入力してください")); err != nil {
 			return err
 		}
 	}
 
-	// Descriptionの検証
 	if input.Description != nil {
 		if err := validation.Validate(*input.Description, validation.Length(0, 255).Error("説明は255文字以内で入力してください")); err != nil {
 			return err
