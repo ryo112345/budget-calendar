@@ -66,6 +66,7 @@ namespace BudgetCalendarService.Category {
     delete(
       @path @doc("カテゴリID") id: int32
     ): NoContentSuccessResponse
+      | ErrorBadRequestResponse
       | NotFoundErrorResponse
       | ErrorInternalServerErrorResponse;
   }

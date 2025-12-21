@@ -1,0 +1,1310 @@
+openapi: 3.0.0
+info:
+  title: Budget Calendar Service
+  version: '1.0'
+  description: Budget Calendar API
+tags:
+  - name: csrf
+  - name: categories
+  - name: users
+  - name: transactions
+  - name: budgets
+paths:
+  /budgets:
+    get:
+      operationId: get-budgets
+      summary: Get Budgets
+      description: ユーザーに紐づく予算一覧を取得。クエリパラメータでフィルタリング可能
+      parameters:
+        - name: month
+          in: query
+          required: false
+          description: 対象月（YYYY-MM形式）
+          schema:
+            type: string
+          explode: false
+        - name: category_id
+          in: query
+          required: false
+          description: カテゴリID
+          schema:
+            type: integer
+            format: int32
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchBudgetListResponse'
+        '400':
+          description: '400 Bad Request - バリデーションエラー (例: INVALID_EMAIL, INVALID_PASSWORD)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - budgets
+      security:
+        - ApiKeyAuth: []
+    post:
+      operationId: post-budgets
+      summary: Create Budget
+      description: 新しい予算を作成
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateBudgetResponse'
+        '400':
+          description: '400 Bad Request - バリデーションエラー (例: INVALID_EMAIL, INVALID_PASSWORD)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: '409 Conflict - リソース競合エラー (例: EMAIL_ALREADY_EXISTS)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - budgets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBudgetInput'
+      security:
+        - ApiKeyAuth: []
+  /budgets/{id}:
+    get:
+      operationId: get-budgets-id
+      summary: Get Budget
+      description: 予算の詳細を取得
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 予算ID
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchBudgetResponse'
+        '400':
+          description: '400 Bad Request - バリデーションエラー (例: INVALID_EMAIL, INVALID_PASSWORD)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - budgets
+      security:
+        - ApiKeyAuth: []
+    patch:
+      operationId: patch-budgets-id
+      summary: Update Budget
+      description: 予算を更新（部分更新）
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 予算ID
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateBudgetResponse'
+        '400':
+          description: '400 Bad Request - バリデーションエラー (例: INVALID_EMAIL, INVALID_PASSWORD)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        '409':
+          description: '409 Conflict - リソース競合エラー (例: EMAIL_ALREADY_EXISTS)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - budgets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBudgetInput'
+      security:
+        - ApiKeyAuth: []
+    delete:
+      operationId: delete-budgets-id
+      summary: Delete Budget
+      description: 予算を削除
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 予算ID
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - budgets
+      security:
+        - ApiKeyAuth: []
+  /categories:
+    get:
+      operationId: get-categories
+      summary: Get Categories
+      description: ユーザーに紐づくカテゴリ一覧を取得
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchCategoryListsResponse'
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - categories
+      security:
+        - ApiKeyAuth: []
+    post:
+      operationId: post-categories
+      summary: Create Category
+      description: 新しいカテゴリを作成
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateCategoryResponse'
+        '400':
+          description: '400 Bad Request - バリデーションエラー (例: INVALID_EMAIL, INVALID_PASSWORD)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - categories
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryInput'
+      security:
+        - ApiKeyAuth: []
+  /categories/{id}:
+    get:
+      operationId: get-categories-id
+      summary: Get Category
+      description: カテゴリの詳細を取得
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: カテゴリID
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchCategoryResponse'
+        '400':
+          description: '400 Bad Request - バリデーションエラー (例: INVALID_EMAIL, INVALID_PASSWORD)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - categories
+      security:
+        - ApiKeyAuth: []
+    patch:
+      operationId: patch-categories-id
+      summary: Update Category
+      description: カテゴリを更新（部分更新）
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: カテゴリID
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateCategoryResponse'
+        '400':
+          description: '400 Bad Request - バリデーションエラー (例: INVALID_EMAIL, INVALID_PASSWORD)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - categories
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCategoryInput'
+      security:
+        - ApiKeyAuth: []
+    delete:
+      operationId: delete-categories-id
+      summary: Delete Category
+      description: カテゴリを削除
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: カテゴリID
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '400':
+          description: '400 Bad Request - バリデーションエラー (例: INVALID_EMAIL, INVALID_PASSWORD)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - categories
+      security:
+        - ApiKeyAuth: []
+  /csrf:
+    get:
+      operationId: get-csrf
+      summary: Get Csrf
+      description: CSRFトークンを取得（認証不要）
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CsrfResponse'
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - csrf
+  /transactions:
+    get:
+      operationId: get-transactions
+      summary: Get Transactions
+      description: ユーザーに紐づく取引一覧を取得。クエリパラメータでフィルタリング可能
+      parameters:
+        - name: start_date
+          in: query
+          required: false
+          description: 開始日（YYYY-MM-DD形式）
+          schema:
+            type: string
+            format: date
+          explode: false
+        - name: end_date
+          in: query
+          required: false
+          description: 終了日（YYYY-MM-DD形式）
+          schema:
+            type: string
+            format: date
+          explode: false
+        - name: type
+          in: query
+          required: false
+          description: 取引タイプ（income/expense）
+          schema:
+            $ref: '#/components/schemas/TransactionType'
+          explode: false
+        - name: category_id
+          in: query
+          required: false
+          description: カテゴリID
+          schema:
+            type: integer
+            format: int32
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchTransactionListResponse'
+        '400':
+          description: '400 Bad Request - バリデーションエラー (例: INVALID_EMAIL, INVALID_PASSWORD)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - transactions
+      security:
+        - ApiKeyAuth: []
+    post:
+      operationId: post-transactions
+      summary: Create Transaction
+      description: 新しい取引を作成
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTransactionResponse'
+        '400':
+          description: '400 Bad Request - バリデーションエラー (例: INVALID_EMAIL, INVALID_PASSWORD)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - transactions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTransactionInput'
+      security:
+        - ApiKeyAuth: []
+  /transactions/{id}:
+    get:
+      operationId: get-transactions-id
+      summary: Get Transaction
+      description: 取引の詳細を取得
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 取引ID
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchTransactionResponse'
+        '400':
+          description: '400 Bad Request - バリデーションエラー (例: INVALID_EMAIL, INVALID_PASSWORD)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - transactions
+      security:
+        - ApiKeyAuth: []
+    patch:
+      operationId: patch-transactions-id
+      summary: Update Transaction
+      description: 取引を更新（部分更新）
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 取引ID
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateTransactionResponse'
+        '400':
+          description: '400 Bad Request - バリデーションエラー (例: INVALID_EMAIL, INVALID_PASSWORD)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - transactions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTransactionInput'
+      security:
+        - ApiKeyAuth: []
+    delete:
+      operationId: delete-transactions-id
+      summary: Delete Transaction
+      description: 取引を削除
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 取引ID
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - transactions
+      security:
+        - ApiKeyAuth: []
+  /users/checkSignedIn:
+    get:
+      operationId: get-users-check-signed-in
+      summary: User CheckSignedIn
+      description: ログイン状態確認
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User.UserCheckSignedInResponse'
+      tags:
+        - users
+      security:
+        - ApiKeyAuth: []
+  /users/signIn:
+    post:
+      operationId: post-users-sign-in
+      summary: User SignIn
+      description: ユーザーログイン
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            set-cookie:
+              required: false
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User.UserSignInResponse'
+        '400':
+          description: '400 Bad Request - バリデーションエラー (例: INVALID_EMAIL, INVALID_PASSWORD)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: '401 Unauthorized - 認証エラー (例: INVALID_CREDENTIALS)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User.SignInInput'
+  /users/signUp:
+    post:
+      operationId: post-users-sign-up
+      summary: User SignUp
+      description: ユーザー登録
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User.UserSignUpResponse'
+        '400':
+          description: '400 Bad Request - バリデーションエラー (例: INVALID_EMAIL, INVALID_PASSWORD)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: '409 Conflict - リソース競合エラー (例: EMAIL_ALREADY_EXISTS)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User.SignUpInput'
+components:
+  schemas:
+    Budget:
+      type: object
+      required:
+        - id
+        - user_id
+        - category_id
+        - category
+        - amount
+        - month
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: 予算ID
+        user_id:
+          type: integer
+          format: int32
+          description: ユーザーID
+        category_id:
+          type: integer
+          format: int32
+          description: カテゴリID
+        category:
+          allOf:
+            - $ref: '#/components/schemas/Category'
+          description: カテゴリ情報
+        amount:
+          type: integer
+          format: int32
+          description: 予算額
+        month:
+          type: string
+          minLength: 7
+          maxLength: 7
+          description: 対象月（YYYY-MM形式）
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新日時
+      description: Budget
+    Category:
+      type: object
+      required:
+        - id
+        - user_id
+        - name
+        - color
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: カテゴリID
+        user_id:
+          type: integer
+          format: int32
+          description: ユーザーID
+        name:
+          type: string
+          maxLength: 100
+          description: カテゴリ名
+        color:
+          type: string
+          maxLength: 20
+          description: カテゴリの色
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新日時
+      description: Category
+    CreateBudgetInput:
+      type: object
+      required:
+        - category_id
+        - amount
+        - month
+      properties:
+        category_id:
+          type: integer
+          format: int32
+          description: カテゴリID
+        amount:
+          type: integer
+          format: int32
+          minimum: 1
+          description: 予算額
+        month:
+          type: string
+          minLength: 7
+          maxLength: 7
+          description: 対象月（YYYY-MM形式）
+      description: Create Budget Input
+    CreateBudgetResponse:
+      type: object
+      required:
+        - budget
+      properties:
+        budget:
+          $ref: '#/components/schemas/Budget'
+      description: Create Budget Response
+    CreateCategoryInput:
+      type: object
+      required:
+        - name
+        - color
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          description: カテゴリ名
+        color:
+          type: string
+          maxLength: 20
+          description: カテゴリの色
+      description: Create Category Input
+    CreateCategoryResponse:
+      type: object
+      required:
+        - category
+      properties:
+        category:
+          $ref: '#/components/schemas/Category'
+      description: Create Category Response
+    CreateTransactionInput:
+      type: object
+      required:
+        - category_id
+        - type
+        - amount
+        - date
+      properties:
+        category_id:
+          type: integer
+          format: int32
+          description: カテゴリID
+        type:
+          allOf:
+            - $ref: '#/components/schemas/TransactionType'
+          description: 取引タイプ（収入/支出）
+        amount:
+          type: integer
+          format: int32
+          minimum: 1
+          description: 金額
+        date:
+          type: string
+          format: date
+          description: 取引日
+        description:
+          type: string
+          maxLength: 255
+          description: 説明
+      description: Create Transaction Input
+    CreateTransactionResponse:
+      type: object
+      required:
+        - transaction
+      properties:
+        transaction:
+          $ref: '#/components/schemas/Transaction'
+      description: Create Transaction Response
+    CsrfResponse:
+      type: object
+      required:
+        - csrfToken
+      properties:
+        csrfToken:
+          type: string
+      title: CsrfResponse
+    ErrorBody:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorResponse'
+      description: エラーレスポンスボディ
+    ErrorInfo:
+      type: object
+      required:
+        - '@type'
+        - reason
+        - domain
+      properties:
+        '@type':
+          type: string
+          enum:
+            - ErrorInfo
+          description: 型識別子
+        reason:
+          allOf:
+            - $ref: '#/components/schemas/ErrorReason'
+          description: エラーの理由
+        domain:
+          type: string
+          description: エラーが発生したドメイン
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          description: 追加のメタデータ（キー・バリュー）
+      description: エラー詳細情報
+    ErrorReason:
+      type: string
+      enum:
+        - EMAIL_ALREADY_EXISTS
+        - INVALID_EMAIL
+        - INVALID_PASSWORD
+        - USER_NOT_FOUND
+        - INVALID_CREDENTIALS
+        - CATEGORY_NOT_FOUND
+        - CATEGORY_IN_USE
+        - INVALID_CATEGORY_NAME
+        - INVALID_CATEGORY_COLOR
+        - TRANSACTION_NOT_FOUND
+        - INVALID_TRANSACTION_TYPE
+        - INVALID_AMOUNT
+        - INVALID_DATE
+        - BUDGET_NOT_FOUND
+        - INVALID_MONTH
+        - INVALID_BUDGET_AMOUNT
+        - BUDGET_ALREADY_EXISTS
+        - DATABASE_ERROR
+        - UNKNOWN_ERROR
+      description: エラー理由の定数
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+        - status
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: HTTPステータスコード
+        message:
+          type: string
+          description: 人間が読めるエラーメッセージ
+        status:
+          allOf:
+            - $ref: '#/components/schemas/ErrorStatus'
+          description: 標準エラーステータス
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorInfo'
+          description: 詳細なエラー情報
+      description: エラーレスポンス
+    ErrorStatus:
+      type: string
+      enum:
+        - INVALID_ARGUMENT
+        - ALREADY_EXISTS
+        - NOT_FOUND
+        - PERMISSION_DENIED
+        - UNAUTHENTICATED
+        - INTERNAL
+      description: 標準エラーステータス（Google API Standard準拠）
+    FetchBudgetListResponse:
+      type: object
+      required:
+        - budgets
+      properties:
+        budgets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Budget'
+      description: Fetch Budget List Response
+    FetchBudgetResponse:
+      type: object
+      required:
+        - budget
+      properties:
+        budget:
+          $ref: '#/components/schemas/Budget'
+      description: Fetch Budget Response
+    FetchCategoryListsResponse:
+      type: object
+      required:
+        - categories
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+      description: Fetch Category Lists Response
+    FetchCategoryResponse:
+      type: object
+      required:
+        - category
+      properties:
+        category:
+          $ref: '#/components/schemas/Category'
+      description: Fetch Category Response
+    FetchTransactionListResponse:
+      type: object
+      required:
+        - transactions
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+      description: Fetch Transaction List Response
+    FetchTransactionResponse:
+      type: object
+      required:
+        - transaction
+      properties:
+        transaction:
+          $ref: '#/components/schemas/Transaction'
+      description: Fetch Transaction Response
+    Transaction:
+      type: object
+      required:
+        - id
+        - user_id
+        - category_id
+        - category
+        - type
+        - amount
+        - date
+        - description
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: 取引ID
+        user_id:
+          type: integer
+          format: int32
+          description: ユーザーID
+        category_id:
+          type: integer
+          format: int32
+          description: カテゴリID
+        category:
+          allOf:
+            - $ref: '#/components/schemas/Category'
+          description: カテゴリ情報
+        type:
+          allOf:
+            - $ref: '#/components/schemas/TransactionType'
+          description: 取引タイプ（収入/支出）
+        amount:
+          type: integer
+          format: int32
+          description: 金額
+        date:
+          type: string
+          format: date
+          description: 取引日
+        description:
+          type: string
+          maxLength: 255
+          description: 説明
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新日時
+      description: Transaction
+    TransactionType:
+      type: string
+      enum:
+        - income
+        - expense
+      description: 取引タイプ
+    UpdateBudgetInput:
+      type: object
+      properties:
+        category_id:
+          type: integer
+          format: int32
+          description: カテゴリID
+        amount:
+          type: integer
+          format: int32
+          minimum: 1
+          description: 予算額
+        month:
+          type: string
+          minLength: 7
+          maxLength: 7
+          description: 対象月（YYYY-MM形式）
+      description: Update Budget Input (partial update)
+    UpdateBudgetResponse:
+      type: object
+      required:
+        - budget
+      properties:
+        budget:
+          $ref: '#/components/schemas/Budget'
+      description: Update Budget Response
+    UpdateCategoryInput:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          description: カテゴリ名
+        color:
+          type: string
+          maxLength: 20
+          description: カテゴリの色
+      description: Update Category Input (partial update)
+    UpdateCategoryResponse:
+      type: object
+      required:
+        - category
+      properties:
+        category:
+          $ref: '#/components/schemas/Category'
+      description: Update Category Response
+    UpdateTransactionInput:
+      type: object
+      properties:
+        category_id:
+          type: integer
+          format: int32
+          description: カテゴリID
+        type:
+          allOf:
+            - $ref: '#/components/schemas/TransactionType'
+          description: 取引タイプ（収入/支出）
+        amount:
+          type: integer
+          format: int32
+          minimum: 1
+          description: 金額
+        date:
+          type: string
+          format: date
+          description: 取引日
+        description:
+          type: string
+          maxLength: 255
+          description: 説明
+      description: Update Transaction Input (partial update)
+    UpdateTransactionResponse:
+      type: object
+      required:
+        - transaction
+      properties:
+        transaction:
+          $ref: '#/components/schemas/Transaction'
+      description: Update Transaction Response
+    User.SignInInput:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          description: メールアドレス
+        password:
+          type: string
+          description: パスワード
+      description: Sign In Input
+    User.SignUpInput:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          description: ユーザー名
+        email:
+          type: string
+          description: メールアドレス
+        password:
+          type: string
+          description: パスワード
+      description: Sign Up Input
+    User.UserCheckSignedInResponse:
+      type: object
+      required:
+        - is_signed_in
+      properties:
+        is_signed_in:
+          type: boolean
+          description: ログイン状態
+      description: User CheckSignedIn Response
+    User.UserSignInResponse:
+      type: object
+      description: User Sign In Response
+    User.UserSignUpResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: メッセージ
+      description: User Sign Up Response
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: cookie
+      name: token
+servers:
+  - url: http://localhost:8080
+    variables: {}

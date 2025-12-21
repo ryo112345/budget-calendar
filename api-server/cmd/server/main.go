@@ -25,12 +25,14 @@ func main() {
 	userService := services.NewUserService(dbCon)
 	categoryService := services.NewCategoryService(dbCon)
 	transactionService := services.NewTransactionService(dbCon)
+	budgetService := services.NewBudgetService(dbCon)
 
 	// NOTE: Handlerのインスタンス
 	csrfHandler := handlers.NewCsrfHandler()
 	usersHandler := handlers.NewUsersHandler(userService)
 	categoriesHandler := handlers.NewCategoriesHandler(categoryService)
 	transactionsHandler := handlers.NewTransactionsHandler(transactionService)
+	budgetsHandler := handlers.NewBudgetsHandler(budgetService)
 
 	// NOTE: Echoインスタンスとミドルウェアの設定
 	e := echo.New()
@@ -41,7 +43,7 @@ func main() {
 	})
 
 	// NOTE: Handlerをルーティングに追加
-	mainHandler := handlers.NewMainHandler(csrfHandler, usersHandler, categoriesHandler, transactionsHandler)
+	mainHandler := handlers.NewMainHandler(csrfHandler, usersHandler, categoriesHandler, transactionsHandler, budgetsHandler)
 	mainStrictHandler := api.NewStrictHandler(mainHandler, []api.StrictMiddlewareFunc{middlewares.AuthMiddleware})
 	api.RegisterHandlers(e, mainStrictHandler)
 

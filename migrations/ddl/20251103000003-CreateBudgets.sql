@@ -11,7 +11,10 @@ CREATE TABLE IF NOT EXISTS budgets(
 	deleted_at DATETIME,
 	INDEX idx_user_id (user_id),
 	INDEX idx_category_id (category_id),
-	INDEX idx_month (month)
+	INDEX idx_month (month),
+	UNIQUE KEY uk_user_category_month (user_id, category_id, month),
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT
 );
 
 -- +migrate Down

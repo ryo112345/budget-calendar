@@ -6,6 +6,7 @@ import (
 
 	api "apps/apis"
 	"apps/internal/helpers"
+	"apps/internal/models"
 	"apps/internal/services"
 
 	"gorm.io/gorm"
@@ -61,14 +62,7 @@ func (h *categoriesHandler) GetCategories(ctx context.Context, request api.GetCa
 
 	apiCategories := make([]api.Category, len(categories))
 	for i, cat := range categories {
-		apiCategories[i] = api.Category{
-			Id:        int32(cat.ID),
-			UserId:    int32(cat.UserID),
-			Name:      cat.Name,
-			Color:     cat.Color,
-			CreatedAt: cat.CreatedAt,
-			UpdatedAt: cat.UpdatedAt,
-		}
+		apiCategories[i] = toAPICategory(&cat)
 	}
 
 	return api.GetCategories200JSONResponse{
@@ -119,14 +113,7 @@ func (h *categoriesHandler) PostCategories(ctx context.Context, request api.Post
 	}
 
 	return api.PostCategories201JSONResponse{
-		Category: api.Category{
-			Id:        int32(category.ID),
-			UserId:    int32(category.UserID),
-			Name:      category.Name,
-			Color:     category.Color,
-			CreatedAt: category.CreatedAt,
-			UpdatedAt: category.UpdatedAt,
-		},
+		Category: toAPICategory(category),
 	}, nil
 }
 
@@ -136,20 +123,30 @@ func (h *categoriesHandler) GetCategoriesId(ctx context.Context, request api.Get
 
 	category, err := h.service.FetchCategoryByID(uint(request.Id), userID)
 	if err != nil {
-		return api.GetCategoriesId404JSONResponse{
-			Message: "カテゴリが見つかりません",
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return api.GetCategoriesId404JSONResponse{
+				Message: "カテゴリが見つかりません",
+			}, nil
+		}
+
+		return api.GetCategoriesId500JSONResponse{
+			Error: api.ErrorResponse{
+				Code:    500,
+				Message: "サーバーエラーが発生しました",
+				Status:  api.INTERNAL,
+				Details: &[]api.ErrorInfo{
+					{
+						Type:   api.ErrorInfoTypeErrorInfo,
+						Reason: api.DATABASEERROR,
+						Domain: "budget-calendar.example.com",
+					},
+				},
+			},
 		}, nil
 	}
 
 	return api.GetCategoriesId200JSONResponse{
-		Category: api.Category{
-			Id:        int32(category.ID),
-			UserId:    int32(category.UserID),
-			Name:      category.Name,
-			Color:     category.Color,
-			CreatedAt: category.CreatedAt,
-			UpdatedAt: category.UpdatedAt,
-		},
+		Category: toAPICategory(category),
 	}, nil
 }
 
@@ -204,14 +201,7 @@ func (h *categoriesHandler) PatchCategoriesId(ctx context.Context, request api.P
 	}
 
 	return api.PatchCategoriesId200JSONResponse{
-		Category: api.Category{
-			Id:        int32(category.ID),
-			UserId:    int32(category.UserID),
-			Name:      category.Name,
-			Color:     category.Color,
-			CreatedAt: category.CreatedAt,
-			UpdatedAt: category.UpdatedAt,
-		},
+		Category: toAPICategory(category),
 	}, nil
 }
 
@@ -224,6 +214,24 @@ func (h *categoriesHandler) DeleteCategoriesId(ctx context.Context, request api.
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return api.DeleteCategoriesId404JSONResponse{
 				Message: "カテゴリが見つかりません",
+			}, nil
+		}
+
+		// カテゴリが使用中の場合（外部キー制約違反）
+		if helpers.IsForeignKeyViolation(err) {
+			return api.DeleteCategoriesId400JSONResponse{
+				Error: api.ErrorResponse{
+					Code:    400,
+					Message: "このカテゴリは使用中のため削除できません",
+					Status:  api.INVALIDARGUMENT,
+					Details: &[]api.ErrorInfo{
+						{
+							Type:   api.ErrorInfoTypeErrorInfo,
+							Reason: api.CATEGORYINUSE,
+							Domain: "budget-calendar.example.com",
+						},
+					},
+				},
 			}, nil
 		}
 
@@ -245,5 +253,17 @@ func (h *categoriesHandler) DeleteCategoriesId(ctx context.Context, request api.
 	}
 
 	return api.DeleteCategoriesId204Response{}, nil
+}
+
+// toAPICategory converts models.Category to api.Category
+func toAPICategory(c *models.Category) api.Category {
+	return api.Category{
+		Id:        int32(c.ID),
+		UserId:    int32(c.UserID),
+		Name:      c.Name,
+		Color:     c.Color,
+		CreatedAt: c.CreatedAt,
+		UpdatedAt: c.UpdatedAt,
+	}
 }
 

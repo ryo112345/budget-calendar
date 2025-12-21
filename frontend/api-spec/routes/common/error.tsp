@@ -45,6 +45,9 @@ enum ErrorReason {
   @doc("カテゴリが見つからない - 推奨メッセージ: カテゴリが見つかりません")
   CATEGORY_NOT_FOUND: "CATEGORY_NOT_FOUND",
 
+  @doc("カテゴリが使用中 - 推奨メッセージ: このカテゴリは使用中のため削除できません")
+  CATEGORY_IN_USE: "CATEGORY_IN_USE",
+
   @doc("無効なカテゴリ名 - 推奨メッセージ: カテゴリ名を正しく入力してください")
   INVALID_CATEGORY_NAME: "INVALID_CATEGORY_NAME",
 
@@ -63,6 +66,19 @@ enum ErrorReason {
 
   @doc("無効な日付 - 推奨メッセージ: 日付を正しく入力してください")
   INVALID_DATE: "INVALID_DATE",
+
+  // Budget関連
+  @doc("予算が見つからない - 推奨メッセージ: 予算が見つかりません")
+  BUDGET_NOT_FOUND: "BUDGET_NOT_FOUND",
+
+  @doc("無効な月形式 - 推奨メッセージ: 月はYYYY-MM形式で入力してください")
+  INVALID_MONTH: "INVALID_MONTH",
+
+  @doc("無効な予算額 - 推奨メッセージ: 予算額は1以上の数値を入力してください")
+  INVALID_BUDGET_AMOUNT: "INVALID_BUDGET_AMOUNT",
+
+  @doc("予算が既に存在 - 推奨メッセージ: この月のこのカテゴリの予算は既に存在します")
+  BUDGET_ALREADY_EXISTS: "BUDGET_ALREADY_EXISTS",
 
   // その他
   @doc("データベースエラー - 推奨メッセージ: サーバーエラーが発生しました")

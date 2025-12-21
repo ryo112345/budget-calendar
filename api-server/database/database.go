@@ -11,7 +11,7 @@ import (
 
 var DB *gorm.DB
 
-func Init() {
+func Init() *gorm.DB {
 	var err error
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
@@ -28,4 +28,5 @@ func Init() {
 	}
 
 	log.Println("Database connection established")
+	return DB
 }
