@@ -1,0 +1,46 @@
+{
+  "name": "budget-calendar",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "react-router build",
+    "dev": "react-router dev",
+    "start": "react-router-serve ./build/server/index.js",
+    "typecheck": "react-router typegen && tsc",
+    "lint": "eslint './**/*.{js,jsx,ts,tsx,json}'",
+    "lint:fix": "eslint --fix './**/*.{js,jsx,ts,tsx,json}'",
+    "format": "prettier --check './**/*.{ts,tsx}'",
+    "format:fix": "prettier --write './**/*.{js,jsx,ts,tsx,json}'",
+    "gen:client": "orval --config orval.config.ts"
+  },
+  "dependencies": {
+    "@fullcalendar/core": "^6.1.19",
+    "@fullcalendar/daygrid": "^6.1.19",
+    "@fullcalendar/interaction": "^6.1.19",
+    "@fullcalendar/react": "^6.1.19",
+    "@react-router/node": "^7.5.1",
+    "@react-router/serve": "^7.5.1",
+    "@tanstack/react-query": "^5.90.12",
+    "date-fns": "^4.1.0",
+    "isbot": "^5.1.17",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-error-boundary": "^6.0.0",
+    "react-router": "^7.5.1"
+  },
+  "devDependencies": {
+    "@react-router/dev": "^7.5.1",
+    "@tailwindcss/vite": "^4.1.18",
+    "@types/node": "^20",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "orval": "^7.13.2",
+    "prettier": "^3.7.4",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11",
+    "vite-tsconfig-paths": "^6.0.3"
+  }
+}
