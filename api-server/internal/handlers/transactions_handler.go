@@ -144,7 +144,18 @@ func (h *transactionsHandler) GetTransactionsId(ctx context.Context, request api
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return api.GetTransactionsId404JSONResponse{
-				Message: "取引が見つかりません",
+				Error: api.ErrorResponse{
+					Code:    404,
+					Message: "取引が見つかりません",
+					Status:  api.NOTFOUND,
+					Details: &[]api.ErrorInfo{
+						{
+							Type:   api.ErrorInfoTypeErrorInfo,
+							Reason: api.TRANSACTIONNOTFOUND,
+							Domain: "budget-calendar.example.com",
+						},
+					},
+				},
 			}, nil
 		}
 
@@ -198,7 +209,18 @@ func (h *transactionsHandler) PatchTransactionsId(ctx context.Context, request a
 		// 取引またはカテゴリが見つからない場合
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return api.PatchTransactionsId404JSONResponse{
-				Message: "取引が見つかりません",
+				Error: api.ErrorResponse{
+					Code:    404,
+					Message: "取引が見つかりません",
+					Status:  api.NOTFOUND,
+					Details: &[]api.ErrorInfo{
+						{
+							Type:   api.ErrorInfoTypeErrorInfo,
+							Reason: api.TRANSACTIONNOTFOUND,
+							Domain: "budget-calendar.example.com",
+						},
+					},
+				},
 			}, nil
 		}
 
@@ -232,7 +254,18 @@ func (h *transactionsHandler) DeleteTransactionsId(ctx context.Context, request 
 		// 取引が見つからない場合
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return api.DeleteTransactionsId404JSONResponse{
-				Message: "取引が見つかりません",
+				Error: api.ErrorResponse{
+					Code:    404,
+					Message: "取引が見つかりません",
+					Status:  api.NOTFOUND,
+					Details: &[]api.ErrorInfo{
+						{
+							Type:   api.ErrorInfoTypeErrorInfo,
+							Reason: api.TRANSACTIONNOTFOUND,
+							Domain: "budget-calendar.example.com",
+						},
+					},
+				},
 			}, nil
 		}
 

@@ -125,12 +125,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                required:
-                  - message
+                $ref: '#/components/schemas/ErrorBody'
         '500':
           description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
           content:
@@ -171,12 +166,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                required:
-                  - message
+                $ref: '#/components/schemas/ErrorBody'
         '409':
           description: '409 Conflict - リソース競合エラー (例: EMAIL_ALREADY_EXISTS)'
           content:
@@ -219,12 +209,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                required:
-                  - message
+                $ref: '#/components/schemas/ErrorBody'
         '500':
           description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
           content:
@@ -323,12 +308,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                required:
-                  - message
+                $ref: '#/components/schemas/ErrorBody'
         '500':
           description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
           content:
@@ -369,12 +349,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                required:
-                  - message
+                $ref: '#/components/schemas/ErrorBody'
         '500':
           description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
           content:
@@ -417,12 +392,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                required:
-                  - message
+                $ref: '#/components/schemas/ErrorBody'
         '500':
           description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
           content:
@@ -579,12 +549,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                required:
-                  - message
+                $ref: '#/components/schemas/ErrorBody'
         '500':
           description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
           content:
@@ -625,12 +590,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                required:
-                  - message
+                $ref: '#/components/schemas/ErrorBody'
         '500':
           description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
           content:
@@ -667,12 +627,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                required:
-                  - message
+                $ref: '#/components/schemas/ErrorBody'
         '500':
           description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
           content:

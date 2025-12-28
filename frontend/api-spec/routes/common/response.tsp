@@ -1,4 +1,5 @@
 import "@typespec/http";
+import "./error.tsp";
 
 using Http;
 
@@ -18,7 +19,6 @@ model NoContentSuccessResponse {
 
 model NotFoundErrorResponse {
   @statusCode status: 404;
-  @body body: {
-    message: string;
-  };
+  @header contentType: "application/json";
+  @body body: ErrorBody;
 }

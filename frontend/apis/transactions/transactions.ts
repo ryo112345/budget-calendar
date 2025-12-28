@@ -24,13 +24,10 @@ import type {
 import type {
   CreateTransactionInput,
   CreateTransactionResponse,
-  DeleteTransactionsId404,
   ErrorBody,
   FetchTransactionListResponse,
   FetchTransactionResponse,
-  GetTransactionsId404,
   GetTransactionsParams,
-  PatchTransactionsId404,
   UpdateTransactionInput,
   UpdateTransactionResponse,
 } from ".././model";
@@ -260,7 +257,7 @@ export type getTransactionsIdResponse400 = {
 };
 
 export type getTransactionsIdResponse404 = {
-  data: GetTransactionsId404;
+  data: ErrorBody;
   status: 404;
 };
 
@@ -293,10 +290,7 @@ export const getGetTransactionsIdQueryKey = (id?: number) => {
   return [`/transactions/${id}`] as const;
 };
 
-export const getGetTransactionsIdQueryOptions = <
-  TData = Awaited<ReturnType<typeof getTransactionsId>>,
-  TError = ErrorBody | GetTransactionsId404 | ErrorBody,
->(
+export const getGetTransactionsIdQueryOptions = <TData = Awaited<ReturnType<typeof getTransactionsId>>, TError = ErrorBody | ErrorBody | ErrorBody>(
   id: number,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getTransactionsId>>, TError, TData>>;
@@ -315,9 +309,9 @@ export const getGetTransactionsIdQueryOptions = <
 };
 
 export type GetTransactionsIdQueryResult = NonNullable<Awaited<ReturnType<typeof getTransactionsId>>>;
-export type GetTransactionsIdQueryError = ErrorBody | GetTransactionsId404 | ErrorBody;
+export type GetTransactionsIdQueryError = ErrorBody | ErrorBody | ErrorBody;
 
-export function useGetTransactionsId<TData = Awaited<ReturnType<typeof getTransactionsId>>, TError = ErrorBody | GetTransactionsId404 | ErrorBody>(
+export function useGetTransactionsId<TData = Awaited<ReturnType<typeof getTransactionsId>>, TError = ErrorBody | ErrorBody | ErrorBody>(
   id: number,
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getTransactionsId>>, TError, TData>> &
@@ -329,7 +323,7 @@ export function useGetTransactionsId<TData = Awaited<ReturnType<typeof getTransa
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetTransactionsId<TData = Awaited<ReturnType<typeof getTransactionsId>>, TError = ErrorBody | GetTransactionsId404 | ErrorBody>(
+export function useGetTransactionsId<TData = Awaited<ReturnType<typeof getTransactionsId>>, TError = ErrorBody | ErrorBody | ErrorBody>(
   id: number,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getTransactionsId>>, TError, TData>> &
@@ -341,7 +335,7 @@ export function useGetTransactionsId<TData = Awaited<ReturnType<typeof getTransa
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetTransactionsId<TData = Awaited<ReturnType<typeof getTransactionsId>>, TError = ErrorBody | GetTransactionsId404 | ErrorBody>(
+export function useGetTransactionsId<TData = Awaited<ReturnType<typeof getTransactionsId>>, TError = ErrorBody | ErrorBody | ErrorBody>(
   id: number,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getTransactionsId>>, TError, TData>>;
@@ -353,7 +347,7 @@ export function useGetTransactionsId<TData = Awaited<ReturnType<typeof getTransa
  * @summary Get Transaction
  */
 
-export function useGetTransactionsId<TData = Awaited<ReturnType<typeof getTransactionsId>>, TError = ErrorBody | GetTransactionsId404 | ErrorBody>(
+export function useGetTransactionsId<TData = Awaited<ReturnType<typeof getTransactionsId>>, TError = ErrorBody | ErrorBody | ErrorBody>(
   id: number,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getTransactionsId>>, TError, TData>>;
@@ -385,7 +379,7 @@ export type patchTransactionsIdResponse400 = {
 };
 
 export type patchTransactionsIdResponse404 = {
-  data: PatchTransactionsId404;
+  data: ErrorBody;
   status: 404;
 };
 
@@ -420,7 +414,7 @@ export const patchTransactionsId = async (
   });
 };
 
-export const getPatchTransactionsIdMutationOptions = <TError = ErrorBody | PatchTransactionsId404 | ErrorBody, TContext = unknown>(options?: {
+export const getPatchTransactionsIdMutationOptions = <TError = ErrorBody | ErrorBody | ErrorBody, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<Awaited<ReturnType<typeof patchTransactionsId>>, TError, { id: number; data: UpdateTransactionInput }, TContext>;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<Awaited<ReturnType<typeof patchTransactionsId>>, TError, { id: number; data: UpdateTransactionInput }, TContext> => {
@@ -442,12 +436,12 @@ export const getPatchTransactionsIdMutationOptions = <TError = ErrorBody | Patch
 
 export type PatchTransactionsIdMutationResult = NonNullable<Awaited<ReturnType<typeof patchTransactionsId>>>;
 export type PatchTransactionsIdMutationBody = UpdateTransactionInput;
-export type PatchTransactionsIdMutationError = ErrorBody | PatchTransactionsId404 | ErrorBody;
+export type PatchTransactionsIdMutationError = ErrorBody | ErrorBody | ErrorBody;
 
 /**
  * @summary Update Transaction
  */
-export const usePatchTransactionsId = <TError = ErrorBody | PatchTransactionsId404 | ErrorBody, TContext = unknown>(
+export const usePatchTransactionsId = <TError = ErrorBody | ErrorBody | ErrorBody, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<Awaited<ReturnType<typeof patchTransactionsId>>, TError, { id: number; data: UpdateTransactionInput }, TContext>;
     request?: SecondParameter<typeof customFetch>;
@@ -468,7 +462,7 @@ export type deleteTransactionsIdResponse204 = {
 };
 
 export type deleteTransactionsIdResponse404 = {
-  data: DeleteTransactionsId404;
+  data: ErrorBody;
   status: 404;
 };
 
@@ -497,7 +491,7 @@ export const deleteTransactionsId = async (id: number, options?: RequestInit): P
   });
 };
 
-export const getDeleteTransactionsIdMutationOptions = <TError = DeleteTransactionsId404 | ErrorBody, TContext = unknown>(options?: {
+export const getDeleteTransactionsIdMutationOptions = <TError = ErrorBody | ErrorBody, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteTransactionsId>>, TError, { id: number }, TContext>;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<Awaited<ReturnType<typeof deleteTransactionsId>>, TError, { id: number }, TContext> => {
@@ -519,12 +513,12 @@ export const getDeleteTransactionsIdMutationOptions = <TError = DeleteTransactio
 
 export type DeleteTransactionsIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteTransactionsId>>>;
 
-export type DeleteTransactionsIdMutationError = DeleteTransactionsId404 | ErrorBody;
+export type DeleteTransactionsIdMutationError = ErrorBody | ErrorBody;
 
 /**
  * @summary Delete Transaction
  */
-export const useDeleteTransactionsId = <TError = DeleteTransactionsId404 | ErrorBody, TContext = unknown>(
+export const useDeleteTransactionsId = <TError = ErrorBody | ErrorBody, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteTransactionsId>>, TError, { id: number }, TContext>;
     request?: SecondParameter<typeof customFetch>;

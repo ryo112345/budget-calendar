@@ -24,12 +24,9 @@ import type {
 import type {
   CreateCategoryInput,
   CreateCategoryResponse,
-  DeleteCategoriesId404,
   ErrorBody,
   FetchCategoryListsResponse,
   FetchCategoryResponse,
-  GetCategoriesId404,
-  PatchCategoriesId404,
   UpdateCategoryInput,
   UpdateCategoryResponse,
 } from ".././model";
@@ -231,7 +228,7 @@ export type getCategoriesIdResponse400 = {
 };
 
 export type getCategoriesIdResponse404 = {
-  data: GetCategoriesId404;
+  data: ErrorBody;
   status: 404;
 };
 
@@ -264,10 +261,7 @@ export const getGetCategoriesIdQueryKey = (id?: number) => {
   return [`/categories/${id}`] as const;
 };
 
-export const getGetCategoriesIdQueryOptions = <
-  TData = Awaited<ReturnType<typeof getCategoriesId>>,
-  TError = ErrorBody | GetCategoriesId404 | ErrorBody,
->(
+export const getGetCategoriesIdQueryOptions = <TData = Awaited<ReturnType<typeof getCategoriesId>>, TError = ErrorBody | ErrorBody | ErrorBody>(
   id: number,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoriesId>>, TError, TData>>;
@@ -286,9 +280,9 @@ export const getGetCategoriesIdQueryOptions = <
 };
 
 export type GetCategoriesIdQueryResult = NonNullable<Awaited<ReturnType<typeof getCategoriesId>>>;
-export type GetCategoriesIdQueryError = ErrorBody | GetCategoriesId404 | ErrorBody;
+export type GetCategoriesIdQueryError = ErrorBody | ErrorBody | ErrorBody;
 
-export function useGetCategoriesId<TData = Awaited<ReturnType<typeof getCategoriesId>>, TError = ErrorBody | GetCategoriesId404 | ErrorBody>(
+export function useGetCategoriesId<TData = Awaited<ReturnType<typeof getCategoriesId>>, TError = ErrorBody | ErrorBody | ErrorBody>(
   id: number,
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoriesId>>, TError, TData>> &
@@ -300,7 +294,7 @@ export function useGetCategoriesId<TData = Awaited<ReturnType<typeof getCategori
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetCategoriesId<TData = Awaited<ReturnType<typeof getCategoriesId>>, TError = ErrorBody | GetCategoriesId404 | ErrorBody>(
+export function useGetCategoriesId<TData = Awaited<ReturnType<typeof getCategoriesId>>, TError = ErrorBody | ErrorBody | ErrorBody>(
   id: number,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoriesId>>, TError, TData>> &
@@ -312,7 +306,7 @@ export function useGetCategoriesId<TData = Awaited<ReturnType<typeof getCategori
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetCategoriesId<TData = Awaited<ReturnType<typeof getCategoriesId>>, TError = ErrorBody | GetCategoriesId404 | ErrorBody>(
+export function useGetCategoriesId<TData = Awaited<ReturnType<typeof getCategoriesId>>, TError = ErrorBody | ErrorBody | ErrorBody>(
   id: number,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoriesId>>, TError, TData>>;
@@ -324,7 +318,7 @@ export function useGetCategoriesId<TData = Awaited<ReturnType<typeof getCategori
  * @summary Get Category
  */
 
-export function useGetCategoriesId<TData = Awaited<ReturnType<typeof getCategoriesId>>, TError = ErrorBody | GetCategoriesId404 | ErrorBody>(
+export function useGetCategoriesId<TData = Awaited<ReturnType<typeof getCategoriesId>>, TError = ErrorBody | ErrorBody | ErrorBody>(
   id: number,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoriesId>>, TError, TData>>;
@@ -356,7 +350,7 @@ export type patchCategoriesIdResponse400 = {
 };
 
 export type patchCategoriesIdResponse404 = {
-  data: PatchCategoriesId404;
+  data: ErrorBody;
   status: 404;
 };
 
@@ -391,7 +385,7 @@ export const patchCategoriesId = async (
   });
 };
 
-export const getPatchCategoriesIdMutationOptions = <TError = ErrorBody | PatchCategoriesId404 | ErrorBody, TContext = unknown>(options?: {
+export const getPatchCategoriesIdMutationOptions = <TError = ErrorBody | ErrorBody | ErrorBody, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<Awaited<ReturnType<typeof patchCategoriesId>>, TError, { id: number; data: UpdateCategoryInput }, TContext>;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<Awaited<ReturnType<typeof patchCategoriesId>>, TError, { id: number; data: UpdateCategoryInput }, TContext> => {
@@ -413,12 +407,12 @@ export const getPatchCategoriesIdMutationOptions = <TError = ErrorBody | PatchCa
 
 export type PatchCategoriesIdMutationResult = NonNullable<Awaited<ReturnType<typeof patchCategoriesId>>>;
 export type PatchCategoriesIdMutationBody = UpdateCategoryInput;
-export type PatchCategoriesIdMutationError = ErrorBody | PatchCategoriesId404 | ErrorBody;
+export type PatchCategoriesIdMutationError = ErrorBody | ErrorBody | ErrorBody;
 
 /**
  * @summary Update Category
  */
-export const usePatchCategoriesId = <TError = ErrorBody | PatchCategoriesId404 | ErrorBody, TContext = unknown>(
+export const usePatchCategoriesId = <TError = ErrorBody | ErrorBody | ErrorBody, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<Awaited<ReturnType<typeof patchCategoriesId>>, TError, { id: number; data: UpdateCategoryInput }, TContext>;
     request?: SecondParameter<typeof customFetch>;
@@ -444,7 +438,7 @@ export type deleteCategoriesIdResponse400 = {
 };
 
 export type deleteCategoriesIdResponse404 = {
-  data: DeleteCategoriesId404;
+  data: ErrorBody;
   status: 404;
 };
 
@@ -473,7 +467,7 @@ export const deleteCategoriesId = async (id: number, options?: RequestInit): Pro
   });
 };
 
-export const getDeleteCategoriesIdMutationOptions = <TError = ErrorBody | DeleteCategoriesId404 | ErrorBody, TContext = unknown>(options?: {
+export const getDeleteCategoriesIdMutationOptions = <TError = ErrorBody | ErrorBody | ErrorBody, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteCategoriesId>>, TError, { id: number }, TContext>;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<Awaited<ReturnType<typeof deleteCategoriesId>>, TError, { id: number }, TContext> => {
@@ -495,12 +489,12 @@ export const getDeleteCategoriesIdMutationOptions = <TError = ErrorBody | Delete
 
 export type DeleteCategoriesIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteCategoriesId>>>;
 
-export type DeleteCategoriesIdMutationError = ErrorBody | DeleteCategoriesId404 | ErrorBody;
+export type DeleteCategoriesIdMutationError = ErrorBody | ErrorBody | ErrorBody;
 
 /**
  * @summary Delete Category
  */
-export const useDeleteCategoriesId = <TError = ErrorBody | DeleteCategoriesId404 | ErrorBody, TContext = unknown>(
+export const useDeleteCategoriesId = <TError = ErrorBody | ErrorBody | ErrorBody, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteCategoriesId>>, TError, { id: number }, TContext>;
     request?: SecondParameter<typeof customFetch>;

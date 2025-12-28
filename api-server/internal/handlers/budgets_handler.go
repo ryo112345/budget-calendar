@@ -161,7 +161,18 @@ func (h *budgetsHandler) GetBudgetsId(ctx context.Context, request api.GetBudget
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return api.GetBudgetsId404JSONResponse{
-				Message: "予算が見つかりません",
+				Error: api.ErrorResponse{
+					Code:    404,
+					Message: "予算が見つかりません",
+					Status:  api.NOTFOUND,
+					Details: &[]api.ErrorInfo{
+						{
+							Type:   api.ErrorInfoTypeErrorInfo,
+							Reason: api.BUDGETNOTFOUND,
+							Domain: "budget-calendar.example.com",
+						},
+					},
+				},
 			}, nil
 		}
 
@@ -215,7 +226,18 @@ func (h *budgetsHandler) PatchBudgetsId(ctx context.Context, request api.PatchBu
 		// 予算またはカテゴリが見つからない場合
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return api.PatchBudgetsId404JSONResponse{
-				Message: "予算が見つかりません",
+				Error: api.ErrorResponse{
+					Code:    404,
+					Message: "予算が見つかりません",
+					Status:  api.NOTFOUND,
+					Details: &[]api.ErrorInfo{
+						{
+							Type:   api.ErrorInfoTypeErrorInfo,
+							Reason: api.BUDGETNOTFOUND,
+							Domain: "budget-calendar.example.com",
+						},
+					},
+				},
 			}, nil
 		}
 
@@ -267,7 +289,18 @@ func (h *budgetsHandler) DeleteBudgetsId(ctx context.Context, request api.Delete
 		// 予算が見つからない場合
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return api.DeleteBudgetsId404JSONResponse{
-				Message: "予算が見つかりません",
+				Error: api.ErrorResponse{
+					Code:    404,
+					Message: "予算が見つかりません",
+					Status:  api.NOTFOUND,
+					Details: &[]api.ErrorInfo{
+						{
+							Type:   api.ErrorInfoTypeErrorInfo,
+							Reason: api.BUDGETNOTFOUND,
+							Domain: "budget-calendar.example.com",
+						},
+					},
+				},
 			}, nil
 		}
 

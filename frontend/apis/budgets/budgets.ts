@@ -24,13 +24,10 @@ import type {
 import type {
   CreateBudgetInput,
   CreateBudgetResponse,
-  DeleteBudgetsId404,
   ErrorBody,
   FetchBudgetListResponse,
   FetchBudgetResponse,
-  GetBudgetsId404,
   GetBudgetsParams,
-  PatchBudgetsId404,
   UpdateBudgetInput,
   UpdateBudgetResponse,
 } from ".././model";
@@ -259,7 +256,7 @@ export type getBudgetsIdResponse400 = {
 };
 
 export type getBudgetsIdResponse404 = {
-  data: GetBudgetsId404;
+  data: ErrorBody;
   status: 404;
 };
 
@@ -292,7 +289,7 @@ export const getGetBudgetsIdQueryKey = (id?: number) => {
   return [`/budgets/${id}`] as const;
 };
 
-export const getGetBudgetsIdQueryOptions = <TData = Awaited<ReturnType<typeof getBudgetsId>>, TError = ErrorBody | GetBudgetsId404 | ErrorBody>(
+export const getGetBudgetsIdQueryOptions = <TData = Awaited<ReturnType<typeof getBudgetsId>>, TError = ErrorBody | ErrorBody | ErrorBody>(
   id: number,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getBudgetsId>>, TError, TData>>;
@@ -311,9 +308,9 @@ export const getGetBudgetsIdQueryOptions = <TData = Awaited<ReturnType<typeof ge
 };
 
 export type GetBudgetsIdQueryResult = NonNullable<Awaited<ReturnType<typeof getBudgetsId>>>;
-export type GetBudgetsIdQueryError = ErrorBody | GetBudgetsId404 | ErrorBody;
+export type GetBudgetsIdQueryError = ErrorBody | ErrorBody | ErrorBody;
 
-export function useGetBudgetsId<TData = Awaited<ReturnType<typeof getBudgetsId>>, TError = ErrorBody | GetBudgetsId404 | ErrorBody>(
+export function useGetBudgetsId<TData = Awaited<ReturnType<typeof getBudgetsId>>, TError = ErrorBody | ErrorBody | ErrorBody>(
   id: number,
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getBudgetsId>>, TError, TData>> &
@@ -322,7 +319,7 @@ export function useGetBudgetsId<TData = Awaited<ReturnType<typeof getBudgetsId>>
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetBudgetsId<TData = Awaited<ReturnType<typeof getBudgetsId>>, TError = ErrorBody | GetBudgetsId404 | ErrorBody>(
+export function useGetBudgetsId<TData = Awaited<ReturnType<typeof getBudgetsId>>, TError = ErrorBody | ErrorBody | ErrorBody>(
   id: number,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getBudgetsId>>, TError, TData>> &
@@ -331,7 +328,7 @@ export function useGetBudgetsId<TData = Awaited<ReturnType<typeof getBudgetsId>>
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetBudgetsId<TData = Awaited<ReturnType<typeof getBudgetsId>>, TError = ErrorBody | GetBudgetsId404 | ErrorBody>(
+export function useGetBudgetsId<TData = Awaited<ReturnType<typeof getBudgetsId>>, TError = ErrorBody | ErrorBody | ErrorBody>(
   id: number,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getBudgetsId>>, TError, TData>>;
@@ -343,7 +340,7 @@ export function useGetBudgetsId<TData = Awaited<ReturnType<typeof getBudgetsId>>
  * @summary Get Budget
  */
 
-export function useGetBudgetsId<TData = Awaited<ReturnType<typeof getBudgetsId>>, TError = ErrorBody | GetBudgetsId404 | ErrorBody>(
+export function useGetBudgetsId<TData = Awaited<ReturnType<typeof getBudgetsId>>, TError = ErrorBody | ErrorBody | ErrorBody>(
   id: number,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getBudgetsId>>, TError, TData>>;
@@ -375,7 +372,7 @@ export type patchBudgetsIdResponse400 = {
 };
 
 export type patchBudgetsIdResponse404 = {
-  data: PatchBudgetsId404;
+  data: ErrorBody;
   status: 404;
 };
 
@@ -416,7 +413,7 @@ export const patchBudgetsId = async (id: number, updateBudgetInput: UpdateBudget
   });
 };
 
-export const getPatchBudgetsIdMutationOptions = <TError = ErrorBody | PatchBudgetsId404 | ErrorBody | ErrorBody, TContext = unknown>(options?: {
+export const getPatchBudgetsIdMutationOptions = <TError = ErrorBody | ErrorBody | ErrorBody | ErrorBody, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<Awaited<ReturnType<typeof patchBudgetsId>>, TError, { id: number; data: UpdateBudgetInput }, TContext>;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<Awaited<ReturnType<typeof patchBudgetsId>>, TError, { id: number; data: UpdateBudgetInput }, TContext> => {
@@ -438,12 +435,12 @@ export const getPatchBudgetsIdMutationOptions = <TError = ErrorBody | PatchBudge
 
 export type PatchBudgetsIdMutationResult = NonNullable<Awaited<ReturnType<typeof patchBudgetsId>>>;
 export type PatchBudgetsIdMutationBody = UpdateBudgetInput;
-export type PatchBudgetsIdMutationError = ErrorBody | PatchBudgetsId404 | ErrorBody | ErrorBody;
+export type PatchBudgetsIdMutationError = ErrorBody | ErrorBody | ErrorBody | ErrorBody;
 
 /**
  * @summary Update Budget
  */
-export const usePatchBudgetsId = <TError = ErrorBody | PatchBudgetsId404 | ErrorBody | ErrorBody, TContext = unknown>(
+export const usePatchBudgetsId = <TError = ErrorBody | ErrorBody | ErrorBody | ErrorBody, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<Awaited<ReturnType<typeof patchBudgetsId>>, TError, { id: number; data: UpdateBudgetInput }, TContext>;
     request?: SecondParameter<typeof customFetch>;
@@ -464,7 +461,7 @@ export type deleteBudgetsIdResponse204 = {
 };
 
 export type deleteBudgetsIdResponse404 = {
-  data: DeleteBudgetsId404;
+  data: ErrorBody;
   status: 404;
 };
 
@@ -493,7 +490,7 @@ export const deleteBudgetsId = async (id: number, options?: RequestInit): Promis
   });
 };
 
-export const getDeleteBudgetsIdMutationOptions = <TError = DeleteBudgetsId404 | ErrorBody, TContext = unknown>(options?: {
+export const getDeleteBudgetsIdMutationOptions = <TError = ErrorBody | ErrorBody, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteBudgetsId>>, TError, { id: number }, TContext>;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<Awaited<ReturnType<typeof deleteBudgetsId>>, TError, { id: number }, TContext> => {
@@ -515,12 +512,12 @@ export const getDeleteBudgetsIdMutationOptions = <TError = DeleteBudgetsId404 | 
 
 export type DeleteBudgetsIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteBudgetsId>>>;
 
-export type DeleteBudgetsIdMutationError = DeleteBudgetsId404 | ErrorBody;
+export type DeleteBudgetsIdMutationError = ErrorBody | ErrorBody;
 
 /**
  * @summary Delete Budget
  */
-export const useDeleteBudgetsId = <TError = DeleteBudgetsId404 | ErrorBody, TContext = unknown>(
+export const useDeleteBudgetsId = <TError = ErrorBody | ErrorBody, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteBudgetsId>>, TError, { id: number }, TContext>;
     request?: SecondParameter<typeof customFetch>;

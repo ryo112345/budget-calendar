@@ -125,7 +125,18 @@ func (h *categoriesHandler) GetCategoriesId(ctx context.Context, request api.Get
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return api.GetCategoriesId404JSONResponse{
-				Message: "カテゴリが見つかりません",
+				Error: api.ErrorResponse{
+					Code:    404,
+					Message: "カテゴリが見つかりません",
+					Status:  api.NOTFOUND,
+					Details: &[]api.ErrorInfo{
+						{
+							Type:   api.ErrorInfoTypeErrorInfo,
+							Reason: api.CATEGORYNOTFOUND,
+							Domain: "budget-calendar.example.com",
+						},
+					},
+				},
 			}, nil
 		}
 
@@ -179,7 +190,18 @@ func (h *categoriesHandler) PatchCategoriesId(ctx context.Context, request api.P
 		// カテゴリが見つからない場合
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return api.PatchCategoriesId404JSONResponse{
-				Message: "カテゴリが見つかりません",
+				Error: api.ErrorResponse{
+					Code:    404,
+					Message: "カテゴリが見つかりません",
+					Status:  api.NOTFOUND,
+					Details: &[]api.ErrorInfo{
+						{
+							Type:   api.ErrorInfoTypeErrorInfo,
+							Reason: api.CATEGORYNOTFOUND,
+							Domain: "budget-calendar.example.com",
+						},
+					},
+				},
 			}, nil
 		}
 
@@ -213,7 +235,18 @@ func (h *categoriesHandler) DeleteCategoriesId(ctx context.Context, request api.
 		// カテゴリが見つからない場合
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return api.DeleteCategoriesId404JSONResponse{
-				Message: "カテゴリが見つかりません",
+				Error: api.ErrorResponse{
+					Code:    404,
+					Message: "カテゴリが見つかりません",
+					Status:  api.NOTFOUND,
+					Details: &[]api.ErrorInfo{
+						{
+							Type:   api.ErrorInfoTypeErrorInfo,
+							Reason: api.CATEGORYNOTFOUND,
+							Domain: "budget-calendar.example.com",
+						},
+					},
+				},
 			}, nil
 		}
 
