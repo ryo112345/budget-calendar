@@ -1,15 +1,17 @@
 import { getCsrf } from "~/apis/csrf/csrf";
+import { getErrorMessage } from "../base/errors";
 
 export async function getCsrfToken() {
+  let res;
   try {
-    const res = await getCsrf();
-
-    if (res.status === 500) {
-      throw new Error(`Internal Server Error: ${res.data}`);
-    }
-
-    return res.data.csrfToken;
-  } catch (error) {
-    throw new Error(`Unexpected error: ${error}`);
+    res = await getCsrf();
+  } catch {
+    throw new Error(getErrorMessage("CONNECTION_ERROR"));
   }
+
+  if (res.status === 500) {
+    throw new Error(getErrorMessage(res.data.error.details?.[0]?.reason));
+  }
+
+  return res.data.csrfToken;
 }

@@ -17,7 +17,7 @@ const BaseFormInput = memo(function BaseFormInput({ label, id, validationErrorMe
     if (e.target.type === "number") {
       value = Number(value);
     }
-    let name = e.target.name;
+    const name = e.target.name;
     props.onChange({
       ...e,
       target: {

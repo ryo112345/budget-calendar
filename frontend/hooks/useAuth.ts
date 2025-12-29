@@ -6,7 +6,7 @@ export const useAuth = (isSignedIn: boolean, csrfToken: string) => {
 
   useEffect(() => {
     setAuth({ isSignedIn, csrfToken });
-  }, [isSignedIn, csrfToken]);
+  }, [isSignedIn, csrfToken, setAuth]);
 
   return;
 };

@@ -19,7 +19,7 @@ const BaseFormSelect = memo(function BaseFormSelect({ label, id, options, valida
     if (castNumber) {
       value = Number(value);
     }
-    let name = e.target.name;
+    const name = e.target.name;
     props.onChange({
       ...e,
       target: {

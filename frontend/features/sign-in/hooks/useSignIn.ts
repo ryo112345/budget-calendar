@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import type { UserSignInInput } from "~/apis/model";
 import { NAVIGATION_PAGE_LIST } from "~/app/routes";
 import { usePostSignIn } from "~/services/users";
+import type { SignInFieldErrors, SignInResult } from "~/services/users/api";
 
 export const useSignIn = (csrfToken: string) => {
   const [userSignInInputs, setUserSignInInputs] = useState<UserSignInInput>({
@@ -14,41 +15,53 @@ export const useSignIn = (csrfToken: string) => {
     setUserSignInInputs((prev: UserSignInInput) => ({ ...prev, ...params }));
   }, []);
 
+  const [errorMessage, setErrorMessage] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<SignInFieldErrors>({});
+
   const setSignInTextInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       updateSignInInput({ [e.target.name]: e.target.value });
+      // 入力時にそのフィールドのエラーをクリア
+      setFieldErrors((prev) => ({ ...prev, [e.target.name]: undefined }));
     },
     [updateSignInInput],
   );
 
-  const [validationError, setValidationError] = useState("");
-
   const navigate = useNavigate();
 
-  const initSignInValidationErrors = useCallback(() => {
-    setValidationError("");
+  const initErrors = useCallback(() => {
+    setErrorMessage("");
+    setFieldErrors({});
   }, []);
 
   const onSuccessPostSignIn = useCallback(
-    (error: string) => {
-      if (error !== "") {
-        setValidationError(error);
-        updateSignInInput({ password: "" });
+    (result: SignInResult) => {
+      if (result.success) {
+        window.alert("ログインしました");
+        navigate(NAVIGATION_PAGE_LIST.calendarPage);
         return;
       }
 
-      window.alert("ログインしました");
-      navigate(NAVIGATION_PAGE_LIST.calendarPage);
+      if (result.fieldErrors) {
+        setFieldErrors(result.fieldErrors);
+      }
+
+      if (result.error) {
+        setErrorMessage(result.error);
+      }
+
+      updateSignInInput({ password: "" });
     },
     [navigate, updateSignInInput],
   );
 
-  const { mutate } = usePostSignIn(initSignInValidationErrors, onSuccessPostSignIn, userSignInInputs, csrfToken);
+  const { mutate } = usePostSignIn(initErrors, onSuccessPostSignIn, userSignInInputs, csrfToken);
 
   return {
     userSignInInputs,
     setSignInTextInput,
-    validationError,
+    errorMessage,
+    fieldErrors,
     mutate,
   };
 };

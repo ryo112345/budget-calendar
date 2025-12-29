@@ -22,11 +22,7 @@ export const authMiddleware: MiddlewareFunction = async ({ request, context }) =
   }
 
   // 認証が必要なページ（トップ、会員登録、ログイン以外）にいるのに未ログイン → ログインページへ
-  if (
-    pathname !== NAVIGATION_PAGE_LIST.top &&
-    pathname !== NAVIGATION_PAGE_LIST.signUpPage &&
-    pathname !== NAVIGATION_PAGE_LIST.signInPage
-  ) {
+  if (pathname !== NAVIGATION_PAGE_LIST.top && pathname !== NAVIGATION_PAGE_LIST.signUpPage && pathname !== NAVIGATION_PAGE_LIST.signInPage) {
     if (!checkedSignedIn) {
       toNavigatePath = NAVIGATION_PAGE_LIST.signInPage;
     }
