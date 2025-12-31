@@ -8,16 +8,16 @@ type RouteDefinition = {
 };
 
 const ROUTE_DEFINITIONS: RouteDefinition[] = [
-  { path: "/", file: "routes/home.tsx", requiresAuth: false },
-  { path: "/sign_up", file: "sign_up/page.tsx", requiresAuth: false },
-  { path: "/sign_in", file: "sign_in/page.tsx", requiresAuth: false, redirectIfAuthenticated: true },
-  { path: "/calendar", file: "calendar/page.tsx", requiresAuth: true },
+  { path: "/", file: "pages/home.tsx", requiresAuth: false },
+  { path: "/sign-up", file: "pages/sign-up.tsx", requiresAuth: false },
+  { path: "/sign-in", file: "pages/sign-in.tsx", requiresAuth: false, redirectIfAuthenticated: true },
+  { path: "/calendar", file: "pages/calendar.tsx", requiresAuth: true },
 ];
 
 export const NAVIGATION_PAGE_LIST = {
   top: "/",
-  signUpPage: "/sign_up",
-  signInPage: "/sign_in",
+  signUpPage: "/sign-up",
+  signInPage: "/sign-in",
   calendarPage: "/calendar",
 };
 

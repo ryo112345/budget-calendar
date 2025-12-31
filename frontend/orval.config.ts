@@ -12,7 +12,7 @@ const config = {
       target: "./apis",
       override: {
         mutator: {
-          path: "./custom-fetch.ts",
+          path: "./shared/lib/fetch.ts",
           name: "customFetch",
         },
         useDates: true,

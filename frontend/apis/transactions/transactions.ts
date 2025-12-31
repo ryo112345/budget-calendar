@@ -32,7 +32,7 @@ import type {
   UpdateTransactionResponse,
 } from ".././model";
 
-import { customFetch } from "../../custom-fetch";
+import { customFetch } from "../../shared/lib/fetch";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 

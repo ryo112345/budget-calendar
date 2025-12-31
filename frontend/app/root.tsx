@@ -4,10 +4,10 @@ import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 
 import type { Route } from "./+types/root";
 import "./app.css";
-import BaseContainer from "~/components/BaseContainer";
-import { HeaderNavigation } from "./HeaderNavigation";
-import { authMiddleware } from "~/middlewares/auth-middleware";
-import { authContext } from "~/middlewares/auth-context";
+import Container from "~/shared/components/ui/Container";
+import { HeaderNavigation } from "~/shared/components/layout/HeaderNavigation";
+import { authMiddleware } from "~/features/auth/auth-middleware";
+import { authContext } from "~/features/auth/auth-context";
 import { NAVIGATION_PAGE_LIST } from "./routes";
 
 export const links: Route.LinksFunction = () => [
@@ -74,7 +74,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <div>
           <HeaderNavigation>
-            <BaseContainer containerWidth='w-4/5'>{children}</BaseContainer>
+            <Container containerWidth='w-4/5'>{children}</Container>
           </HeaderNavigation>
         </div>
         <ScrollRestoration />
