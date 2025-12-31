@@ -1,22 +1,28 @@
 import { type RouteConfig, index, route } from "@react-router/dev/routes";
 
-const NAVIGATION_PATH_LIST = {
-  top: "/",
-  signUpPage: "sign_up",
-  signInPage: "sign_in",
-  calendarPage: "calendar",
+type RouteDefinition = {
+  path: string;
+  file: string;
+  requiresAuth: boolean;
+  redirectIfAuthenticated?: boolean; // ログイン済みならリダイレクト（ログインページ用）
 };
+
+const ROUTE_DEFINITIONS: RouteDefinition[] = [
+  { path: "/", file: "routes/home.tsx", requiresAuth: false },
+  { path: "/sign_up", file: "sign_up/page.tsx", requiresAuth: false },
+  { path: "/sign_in", file: "sign_in/page.tsx", requiresAuth: false, redirectIfAuthenticated: true },
+  { path: "/calendar", file: "calendar/page.tsx", requiresAuth: true },
+];
 
 export const NAVIGATION_PAGE_LIST = {
-  top: NAVIGATION_PATH_LIST.top,
-  signUpPage: `/${NAVIGATION_PATH_LIST.signUpPage}`,
-  signInPage: `/${NAVIGATION_PATH_LIST.signInPage}`,
-  calendarPage: `/${NAVIGATION_PATH_LIST.calendarPage}`,
+  top: "/",
+  signUpPage: "/sign_up",
+  signInPage: "/sign_in",
+  calendarPage: "/calendar",
 };
 
-export default [
-  index("routes/home.tsx"),
-  route(NAVIGATION_PATH_LIST.signUpPage, "sign_up/page.tsx"),
-  route(NAVIGATION_PATH_LIST.signInPage, "sign_in/page.tsx"),
-  route(NAVIGATION_PATH_LIST.calendarPage, "calendar/page.tsx"),
-] satisfies RouteConfig;
+export function getRouteDefinition(pathname: string): RouteDefinition | undefined {
+  return ROUTE_DEFINITIONS.find((r) => r.path === pathname);
+}
+
+export default ROUTE_DEFINITIONS.map((r) => (r.path === "/" ? index(r.file) : route(r.path.slice(1), r.file))) satisfies RouteConfig;

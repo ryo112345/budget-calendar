@@ -1,3 +1,5 @@
+import { invalidateAuthCache } from "~/services/auth/cache";
+
 const getUrl = (contextUrl: string): string => {
   const baseUrl = process.env.VITE_API_ENDPOINT_URI;
 
@@ -32,6 +34,11 @@ export const customFetch = async <T>(url: string, options: RequestInit): Promise
   };
 
   const response = await fetch(requestUrl, requestInit);
+
+  if (response.status === 401) {
+    invalidateAuthCache();
+  }
+
   const data = await getResponseBody<T>(response);
 
   return { status: response.status, data, headers: response.headers } as T;

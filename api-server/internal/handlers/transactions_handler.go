@@ -48,7 +48,7 @@ func (h *transactionsHandler) GetTransactions(ctx context.Context, request api.G
 		return api.GetTransactions500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "サーバーエラーが発生しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{
@@ -83,7 +83,7 @@ func (h *transactionsHandler) PostTransactions(ctx context.Context, request api.
 			return api.PostTransactions400JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    400,
-					Message: "入力値に誤りがあります",
+					Message: "入力内容に誤りがあります",
 					Status:  api.INVALIDARGUMENT,
 					Details: &[]api.ErrorInfo{
 						{
@@ -118,7 +118,7 @@ func (h *transactionsHandler) PostTransactions(ctx context.Context, request api.
 		return api.PostTransactions500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "サーバーエラーが発生しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{
@@ -162,7 +162,7 @@ func (h *transactionsHandler) GetTransactionsId(ctx context.Context, request api
 		return api.GetTransactionsId500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "サーバーエラーが発生しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{
@@ -192,7 +192,7 @@ func (h *transactionsHandler) PatchTransactionsId(ctx context.Context, request a
 			return api.PatchTransactionsId400JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    400,
-					Message: "入力値に誤りがあります",
+					Message: "入力内容に誤りがあります",
 					Status:  api.INVALIDARGUMENT,
 					Details: &[]api.ErrorInfo{
 						{
@@ -228,7 +228,7 @@ func (h *transactionsHandler) PatchTransactionsId(ctx context.Context, request a
 		return api.PatchTransactionsId500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "サーバーエラーが発生しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{
@@ -273,7 +273,7 @@ func (h *transactionsHandler) DeleteTransactionsId(ctx context.Context, request 
 		return api.DeleteTransactionsId500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "サーバーエラーが発生しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{

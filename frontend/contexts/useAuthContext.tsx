@@ -1,4 +1,4 @@
-import { createContext, type FC, useContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 type AuthSetContextType = {
   setAuth: React.Dispatch<React.SetStateAction<AuthContextType>>;
@@ -17,7 +17,7 @@ export const useAuthContext = () => useContext<AuthContextType>(AuthContext);
 
 export const useAuthSetContext = () => useContext<AuthSetContextType>(AuthSetContext);
 
-export const AuthProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [auth, setAuth] = useState<AuthContextType>({ isSignedIn: false, csrfToken: "" });
 
   return (
@@ -25,4 +25,4 @@ export const AuthProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
       <AuthSetContext.Provider value={{ setAuth }}>{children}</AuthSetContext.Provider>
     </AuthContext.Provider>
   );
-};
+}

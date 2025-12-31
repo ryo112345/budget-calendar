@@ -40,7 +40,7 @@ func (uh *usersHandler) PostUsersSignUp(ctx context.Context, request api.PostUse
 			return api.PostUsersSignUp400JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    400,
-					Message: "入力値に誤りがあります",
+					Message: "入力内容に誤りがあります",
 					Status:  api.INVALIDARGUMENT,
 					Details: &[]api.ErrorInfo{
 						{
@@ -76,7 +76,7 @@ func (uh *usersHandler) PostUsersSignUp(ctx context.Context, request api.PostUse
 		return api.PostUsersSignUp500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "サーバーエラーが発生しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{
@@ -103,7 +103,7 @@ func (uh *usersHandler) PostUsersSignIn(ctx context.Context, request api.PostUse
 			return api.PostUsersSignIn400JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    400,
-					Message: "入力値に誤りがあります",
+					Message: "入力内容に誤りがあります",
 					Status:  api.INVALIDARGUMENT,
 					Details: &[]api.ErrorInfo{
 						{
@@ -139,7 +139,7 @@ func (uh *usersHandler) PostUsersSignIn(ctx context.Context, request api.PostUse
 		return api.PostUsersSignIn500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "サーバーエラーが発生しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{

@@ -23,7 +23,7 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
-export const unstable_clientMiddleware = [authMiddleware];
+export const clientMiddleware = [authMiddleware];
 
 const queryClient = new QueryClient();
 

@@ -47,7 +47,7 @@ func (h *budgetsHandler) GetBudgets(ctx context.Context, request api.GetBudgetsR
 		return api.GetBudgets500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "サーバーエラーが発生しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{
@@ -82,7 +82,7 @@ func (h *budgetsHandler) PostBudgets(ctx context.Context, request api.PostBudget
 			return api.PostBudgets400JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    400,
-					Message: "入力値に誤りがあります",
+					Message: "入力内容に誤りがあります",
 					Status:  api.INVALIDARGUMENT,
 					Details: &[]api.ErrorInfo{
 						{
@@ -135,7 +135,7 @@ func (h *budgetsHandler) PostBudgets(ctx context.Context, request api.PostBudget
 		return api.PostBudgets500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "サーバーエラーが発生しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{
@@ -179,7 +179,7 @@ func (h *budgetsHandler) GetBudgetsId(ctx context.Context, request api.GetBudget
 		return api.GetBudgetsId500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "サーバーエラーが発生しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{
@@ -209,7 +209,7 @@ func (h *budgetsHandler) PatchBudgetsId(ctx context.Context, request api.PatchBu
 			return api.PatchBudgetsId400JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    400,
-					Message: "入力値に誤りがあります",
+					Message: "入力内容に誤りがあります",
 					Status:  api.INVALIDARGUMENT,
 					Details: &[]api.ErrorInfo{
 						{
@@ -263,7 +263,7 @@ func (h *budgetsHandler) PatchBudgetsId(ctx context.Context, request api.PatchBu
 		return api.PatchBudgetsId500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "サーバーエラーが発生しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{
@@ -308,7 +308,7 @@ func (h *budgetsHandler) DeleteBudgetsId(ctx context.Context, request api.Delete
 		return api.DeleteBudgetsId500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "サーバーエラーが発生しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{

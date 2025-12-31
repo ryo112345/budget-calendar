@@ -1,4 +1,3 @@
-import type { FC } from "react";
 import { Link } from "react-router";
 import { NAVIGATION_PAGE_LIST } from "./routes";
 import { useAuthContext } from "~/contexts/useAuthContext";
@@ -7,7 +6,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-export const HeaderNavigation: FC<Props> = ({ children }: Props) => {
+export function HeaderNavigation({ children }: Props) {
   const { isSignedIn } = useAuthContext();
 
   return (
@@ -37,4 +36,4 @@ export const HeaderNavigation: FC<Props> = ({ children }: Props) => {
       <div className='mx-auto pt-20 px-6'>{children}</div>
     </>
   );
-};
+}

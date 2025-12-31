@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { useNavigate } from "react-router";
 import type { UserSignInInput } from "~/apis/model";
 import { NAVIGATION_PAGE_LIST } from "~/app/routes";
+import { invalidateAuthCache } from "~/services/auth/cache";
 import { usePostSignIn } from "~/services/users";
 import type { SignInFieldErrors, SignInResult } from "~/services/users/api";
 
@@ -37,6 +38,7 @@ export const useSignIn = (csrfToken: string) => {
   const onSuccessPostSignIn = useCallback(
     (result: SignInResult) => {
       if (result.success) {
+        invalidateAuthCache();
         window.alert("ログインしました");
         navigate(NAVIGATION_PAGE_LIST.calendarPage);
         return;

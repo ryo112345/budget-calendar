@@ -1,36 +1,51 @@
-import { redirect, type unstable_MiddlewareFunction as MiddlewareFunction } from "react-router";
+import { redirect, type MiddlewareFunction } from "react-router";
 import { authContext } from "./auth-context";
-import { NAVIGATION_PAGE_LIST } from "~/app/routes";
+import { getRouteDefinition, NAVIGATION_PAGE_LIST } from "~/app/routes";
 import { getCheckSignedIn } from "~/services/users/api";
 import { getCsrfToken } from "~/services/csrf/api";
+import { getAuthCache, setAuthCache } from "~/services/auth/cache";
+
+async function getAuthState(): Promise<{ csrfToken: string; isSignedIn: boolean }> {
+  const cached = getAuthCache();
+  if (cached) {
+    return { csrfToken: cached.csrfToken, isSignedIn: cached.isSignedIn };
+  }
+
+  const csrfToken = await getCsrfToken();
+  const isSignedIn = await getCheckSignedIn(csrfToken);
+  setAuthCache(csrfToken, isSignedIn);
+
+  return { csrfToken, isSignedIn };
+}
 
 export const authMiddleware: MiddlewareFunction = async ({ request, context }) => {
-  // NOTE: 画面遷移の際にCSRFトークンを取得
-  const csrfToken = await getCsrfToken();
+  const { csrfToken, isSignedIn } = await getAuthState();
 
-  const checkedSignedIn = await getCheckSignedIn(csrfToken);
-
-  let toNavigatePath = "";
   const url = new URL(request.url);
   const pathname = url.pathname;
+  const routeDef = getRouteDefinition(pathname);
 
-  // ログインページにいるのに既にログイン済み → カレンダーページへ
-  if (pathname === NAVIGATION_PAGE_LIST.signInPage) {
-    if (checkedSignedIn) {
-      toNavigatePath = NAVIGATION_PAGE_LIST.calendarPage;
+  let redirectTo: string | null = null;
+
+  if (routeDef) {
+    // ログイン済みユーザーがアクセスすべきでないページ（ログインページ等）→ リダイレクト
+    if (routeDef.redirectIfAuthenticated && isSignedIn) {
+      redirectTo = NAVIGATION_PAGE_LIST.calendarPage;
+    }
+    // 認証が必要なページに未ログインでアクセス
+    if (routeDef.requiresAuth && !isSignedIn) {
+      redirectTo = NAVIGATION_PAGE_LIST.signInPage;
+    }
+  } else {
+    // 未定義のルートは認証必須として扱う（安全側に倒す）
+    if (!isSignedIn) {
+      redirectTo = NAVIGATION_PAGE_LIST.signInPage;
     }
   }
 
-  // 認証が必要なページ（トップ、会員登録、ログイン以外）にいるのに未ログイン → ログインページへ
-  if (pathname !== NAVIGATION_PAGE_LIST.top && pathname !== NAVIGATION_PAGE_LIST.signUpPage && pathname !== NAVIGATION_PAGE_LIST.signInPage) {
-    if (!checkedSignedIn) {
-      toNavigatePath = NAVIGATION_PAGE_LIST.signInPage;
-    }
-  }
+  context.set(authContext, { isSignedIn, csrfToken });
 
-  context.set(authContext, { isSignedIn: checkedSignedIn, csrfToken });
-
-  if (toNavigatePath !== "") {
-    throw redirect(toNavigatePath);
+  if (redirectTo) {
+    throw redirect(redirectTo);
   }
 };

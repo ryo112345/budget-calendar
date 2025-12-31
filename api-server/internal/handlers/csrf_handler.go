@@ -23,7 +23,7 @@ func (ch *csrfHandler) GetCsrf(ctx context.Context, request api.GetCsrfRequestOb
 		return api.GetCsrf500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "CSRFトークンの取得に失敗しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{

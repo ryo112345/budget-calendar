@@ -40,9 +40,9 @@ const BaseFormInput = memo(function BaseFormInput({ label, id, validationErrorMe
         onChange={handleChange}
       />
       {validationErrorMessages.length > 0 && (
-        <div className='w-full pt-5 text-left'>
+        <div className='w-full mt-1 -mb-2 text-left'>
           {validationErrorMessages.map((message, i) => (
-            <p key={i} className='text-red-400'>
+            <p key={i} className='text-red-400 text-sm'>
               {message}
             </p>
           ))}

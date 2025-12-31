@@ -1,8 +1,8 @@
-import { unstable_createContext } from "react-router";
+import { createContext } from "react-router";
 
 export type AuthContext = {
   isSignedIn: boolean;
   csrfToken: string;
 };
 
-export const authContext = unstable_createContext<AuthContext | null>();
+export const authContext = createContext<AuthContext | null>();

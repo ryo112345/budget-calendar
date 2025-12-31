@@ -47,7 +47,7 @@ func (h *categoriesHandler) GetCategories(ctx context.Context, request api.GetCa
 		return api.GetCategories500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "サーバーエラーが発生しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{
@@ -82,7 +82,7 @@ func (h *categoriesHandler) PostCategories(ctx context.Context, request api.Post
 			return api.PostCategories400JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    400,
-					Message: "入力値に誤りがあります",
+					Message: "入力内容に誤りがあります",
 					Status:  api.INVALIDARGUMENT,
 					Details: &[]api.ErrorInfo{
 						{
@@ -99,7 +99,7 @@ func (h *categoriesHandler) PostCategories(ctx context.Context, request api.Post
 		return api.PostCategories500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "サーバーエラーが発生しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{
@@ -143,7 +143,7 @@ func (h *categoriesHandler) GetCategoriesId(ctx context.Context, request api.Get
 		return api.GetCategoriesId500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "サーバーエラーが発生しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{
@@ -173,7 +173,7 @@ func (h *categoriesHandler) PatchCategoriesId(ctx context.Context, request api.P
 			return api.PatchCategoriesId400JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    400,
-					Message: "入力値に誤りがあります",
+					Message: "入力内容に誤りがあります",
 					Status:  api.INVALIDARGUMENT,
 					Details: &[]api.ErrorInfo{
 						{
@@ -209,7 +209,7 @@ func (h *categoriesHandler) PatchCategoriesId(ctx context.Context, request api.P
 		return api.PatchCategoriesId500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "サーバーエラーが発生しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{
@@ -272,7 +272,7 @@ func (h *categoriesHandler) DeleteCategoriesId(ctx context.Context, request api.
 		return api.DeleteCategoriesId500JSONResponse{
 			Error: api.ErrorResponse{
 				Code:    500,
-				Message: "サーバーエラーが発生しました",
+				Message: "エラーが発生しました",
 				Status:  api.INTERNAL,
 				Details: &[]api.ErrorInfo{
 					{
