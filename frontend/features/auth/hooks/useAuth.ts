@@ -1,8 +1,8 @@
 import { useRouteLoaderData } from "react-router";
-import type { AuthContext } from "../auth-context";
+import type { AuthState } from "../auth-context";
 
-export function useAuth(): AuthContext {
-  const data = useRouteLoaderData("root") as AuthContext | undefined;
+export function useAuth(): AuthState {
+  const data = useRouteLoaderData("root") as AuthState | undefined;
 
   return {
     isSignedIn: data?.isSignedIn ?? false,

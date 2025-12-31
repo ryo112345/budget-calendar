@@ -1,8 +1,8 @@
 import { createContext } from "react-router";
 
-export type AuthContext = {
+export type AuthState = {
   isSignedIn: boolean;
   csrfToken: string;
 };
 
-export const authContext = createContext<AuthContext | null>();
+export const authContext = createContext<AuthState | null>();

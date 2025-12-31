@@ -9,7 +9,7 @@ type Props = {
   castNumber?: boolean;
 } & JSX.IntrinsicElements["select"];
 
-const BaseFormSelect = memo(function BaseFormSelect({ label, id, options, validationErrorMessages, castNumber, ...props }: Props) {
+const FormSelect = memo(function FormSelect({ label, id, options, validationErrorMessages, castNumber, ...props }: Props) {
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (props.onChange === undefined) {
       return;
@@ -60,4 +60,4 @@ const BaseFormSelect = memo(function BaseFormSelect({ label, id, options, valida
   );
 });
 
-export default BaseFormSelect;
+export default FormSelect;
