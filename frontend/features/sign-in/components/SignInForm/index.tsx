@@ -1,12 +1,10 @@
 import { Link } from "react-router";
 import BaseButton from "~/components/BaseButton";
 import BaseFormInput from "~/components/BaseFormInput";
-import { useAuthContext } from "~/contexts/useAuthContext";
 import { useSignIn } from "../../hooks/useSignIn";
 
 export function SignInForm() {
-  const { csrfToken } = useAuthContext();
-  const { userSignInInputs, setSignInTextInput, errorMessage, fieldErrors, mutate } = useSignIn(csrfToken);
+  const { userSignInInputs, setSignInTextInput, errorMessage, fieldErrors, mutate } = useSignIn();
 
   return (
     <div className='mx-auto max-w-md px-4 mt-16'>

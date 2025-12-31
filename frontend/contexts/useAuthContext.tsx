@@ -1,28 +1,15 @@
-import { createContext, useContext, useState } from "react";
+import { useRouteLoaderData } from "react-router";
 
-type AuthSetContextType = {
-  setAuth: React.Dispatch<React.SetStateAction<AuthContextType>>;
-};
-
-type AuthContextType = {
+export type AuthContext = {
   isSignedIn: boolean;
   csrfToken: string;
 };
 
-export const AuthContext = createContext<AuthContextType>({ isSignedIn: false, csrfToken: "" });
+export function useAuthContext(): AuthContext {
+  const data = useRouteLoaderData("root") as AuthContext | undefined;
 
-export const AuthSetContext = createContext<AuthSetContextType>({ setAuth: () => undefined });
-
-export const useAuthContext = () => useContext<AuthContextType>(AuthContext);
-
-export const useAuthSetContext = () => useContext<AuthSetContextType>(AuthSetContext);
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [auth, setAuth] = useState<AuthContextType>({ isSignedIn: false, csrfToken: "" });
-
-  return (
-    <AuthContext.Provider value={auth}>
-      <AuthSetContext.Provider value={{ setAuth }}>{children}</AuthSetContext.Provider>
-    </AuthContext.Provider>
-  );
+  return {
+    isSignedIn: data?.isSignedIn ?? false,
+    csrfToken: data?.csrfToken ?? "",
+  };
 }

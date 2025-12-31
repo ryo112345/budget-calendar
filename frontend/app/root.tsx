@@ -7,7 +7,7 @@ import "./app.css";
 import BaseContainer from "~/components/BaseContainer";
 import { HeaderNavigation } from "./HeaderNavigation";
 import { authMiddleware } from "~/middlewares/auth-middleware";
-import { AuthProvider } from "~/contexts/useAuthContext";
+import { authContext } from "~/middlewares/auth-context";
 import { NAVIGATION_PAGE_LIST } from "./routes";
 
 export const links: Route.LinksFunction = () => [
@@ -24,6 +24,11 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export const clientMiddleware = [authMiddleware];
+
+export async function clientLoader({ context }: Route.ClientLoaderArgs) {
+  const auth = context.get(authContext);
+  return { isSignedIn: !!auth?.isSignedIn, csrfToken: auth?.csrfToken ?? "" };
+}
 
 const queryClient = new QueryClient();
 
@@ -59,25 +64,23 @@ function Fallback({ error }: { error: Error }) {
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <AuthProvider>
-      <html lang='ja'>
-        <head>
-          <meta charSet='utf-8' />
-          <meta name='viewport' content='width=device-width, initial-scale=1' />
-          <Meta />
-          <Links />
-        </head>
-        <body>
-          <div>
-            <HeaderNavigation>
-              <BaseContainer containerWidth='w-4/5'>{children}</BaseContainer>
-            </HeaderNavigation>
-          </div>
-          <ScrollRestoration />
-          <Scripts />
-        </body>
-      </html>
-    </AuthProvider>
+    <html lang='ja'>
+      <head>
+        <meta charSet='utf-8' />
+        <meta name='viewport' content='width=device-width, initial-scale=1' />
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <div>
+          <HeaderNavigation>
+            <BaseContainer containerWidth='w-4/5'>{children}</BaseContainer>
+          </HeaderNavigation>
+        </div>
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
   );
 }
 

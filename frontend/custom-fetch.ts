@@ -1,4 +1,4 @@
-import { invalidateAuthCache } from "~/services/auth/cache";
+import { getAuthCache, invalidateAuthCache } from "~/services/auth/cache";
 
 const getUrl = (contextUrl: string): string => {
   const baseUrl = process.env.VITE_API_ENDPOINT_URI;
@@ -17,8 +17,12 @@ const getResponseBody = <T>(response: Response): Promise<T> => {
 
 export const customFetch = async <T>(url: string, options: RequestInit): Promise<T> => {
   const requestUrl = getUrl(url);
-
   const requestHeaders = new Headers(options.headers);
+  const authCache = getAuthCache();
+
+  if (authCache?.csrfToken && !requestHeaders.has("X-CSRF-Token")) {
+    requestHeaders.set("X-CSRF-Token", authCache.csrfToken);
+  }
 
   let body = options.body;
 
@@ -28,7 +32,7 @@ export const customFetch = async <T>(url: string, options: RequestInit): Promise
 
   const requestInit: RequestInit = {
     ...options,
-    headers: options.headers,
+    headers: requestHeaders,
     credentials: "include",
     body,
   };

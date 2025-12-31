@@ -1,12 +1,17 @@
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router";
 import type { UserSignInInput } from "~/apis/model";
+import { usePostUsersSignIn } from "~/apis/users/users";
 import { NAVIGATION_PAGE_LIST } from "~/app/routes";
 import { invalidateAuthCache } from "~/services/auth/cache";
-import { usePostSignIn } from "~/services/users";
-import type { SignInFieldErrors, SignInResult } from "~/services/users/api";
+import { handleMutationError, handleNetworkError } from "~/services/base/mutation-handlers";
 
-export const useSignIn = (csrfToken: string) => {
+type SignInFieldErrors = {
+  email?: string;
+  password?: string;
+};
+
+export const useSignIn = () => {
   const [userSignInInputs, setUserSignInInputs] = useState<UserSignInInput>({
     email: "",
     password: "",
@@ -22,7 +27,6 @@ export const useSignIn = (csrfToken: string) => {
   const setSignInTextInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       updateSignInInput({ [e.target.name]: e.target.value });
-      // 入力時にそのフィールドのエラーをクリア
       setFieldErrors((prev) => ({ ...prev, [e.target.name]: undefined }));
     },
     [updateSignInInput],
@@ -30,40 +34,43 @@ export const useSignIn = (csrfToken: string) => {
 
   const navigate = useNavigate();
 
-  const initErrors = useCallback(() => {
-    setErrorMessage("");
-    setFieldErrors({});
-  }, []);
+  const { mutate } = usePostUsersSignIn({
+    mutation: {
+      onMutate: () => {
+        setErrorMessage("");
+        setFieldErrors({});
+      },
+      onSuccess: (res) => {
+        if (res.status === 200) {
+          invalidateAuthCache();
+          window.alert("ログインしました");
+          navigate(NAVIGATION_PAGE_LIST.calendarPage);
+          return;
+        }
 
-  const onSuccessPostSignIn = useCallback(
-    (result: SignInResult) => {
-      if (result.success) {
-        invalidateAuthCache();
-        window.alert("ログインしました");
-        navigate(NAVIGATION_PAGE_LIST.calendarPage);
-        return;
-      }
-
-      if (result.fieldErrors) {
-        setFieldErrors(result.fieldErrors);
-      }
-
-      if (result.error) {
-        setErrorMessage(result.error);
-      }
-
-      updateSignInInput({ password: "" });
+        handleMutationError(res, {
+          setErrorMessage,
+          setFieldErrors,
+          extractFieldErrors: (metadata) => ({
+            email: metadata.email,
+            password: metadata.password,
+          }),
+          clearPassword: () => updateSignInInput({ password: "" }),
+        });
+      },
+      onError: () => handleNetworkError(setErrorMessage),
     },
-    [navigate, updateSignInInput],
-  );
+  });
 
-  const { mutate } = usePostSignIn(initErrors, onSuccessPostSignIn, userSignInInputs, csrfToken);
+  const handleSubmit = useCallback(() => {
+    mutate({ data: userSignInInputs });
+  }, [mutate, userSignInInputs]);
 
   return {
     userSignInInputs,
     setSignInTextInput,
     errorMessage,
     fieldErrors,
-    mutate,
+    mutate: handleSubmit,
   };
 };
