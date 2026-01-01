@@ -1,3 +1,39 @@
+// APIエラークラス
+export class ApiError extends Error {
+  constructor(
+    public status: number,
+    public data: ErrorResponseData,
+  ) {
+    super(`API Error: ${status}`);
+    this.name = "ApiError";
+  }
+
+  get details() {
+    return this.data.error?.details?.[0];
+  }
+
+  get reason() {
+    return this.details?.reason;
+  }
+
+  get metadata() {
+    return this.details?.metadata;
+  }
+}
+
+export type ErrorResponseData = {
+  error?: {
+    details?: Array<{
+      reason?: string;
+      metadata?: Record<string, string>;
+    }>;
+  };
+};
+
+export function isApiError(error: unknown): error is ApiError {
+  return error instanceof ApiError;
+}
+
 const ERROR_MESSAGES: Record<string, string> = {
   // 認証関連
   EMAIL_ALREADY_EXISTS: "このメールアドレスは既に登録されています",

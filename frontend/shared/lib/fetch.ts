@@ -1,7 +1,8 @@
 import { getAuthCache, invalidateAuthCache } from "~/features/auth/services/cache";
+import { ApiError, type ErrorResponseData } from "./errors";
 
 const getUrl = (contextUrl: string): string => {
-  const baseUrl = process.env.VITE_API_ENDPOINT_URI;
+  const baseUrl = import.meta.env.VITE_API_ENDPOINT_URI;
 
   if (!baseUrl) {
     throw new Error("VITE_API_ENDPOINT_URI is not defined");
@@ -9,10 +10,6 @@ const getUrl = (contextUrl: string): string => {
 
   const requestUrl = new URL(contextUrl, baseUrl);
   return requestUrl.toString();
-};
-
-const getResponseBody = <T>(response: Response): Promise<T> => {
-  return response.json();
 };
 
 export const customFetch = async <T>(url: string, options: RequestInit): Promise<T> => {
@@ -43,7 +40,12 @@ export const customFetch = async <T>(url: string, options: RequestInit): Promise
     invalidateAuthCache();
   }
 
-  const data = await getResponseBody<T>(response);
+  const data = await response.json();
 
-  return { status: response.status, data, headers: response.headers } as T;
+  // エラーレスポンスの場合はApiErrorを投げる
+  if (!response.ok) {
+    throw new ApiError(response.status, data as ErrorResponseData);
+  }
+
+  return data as T;
 };

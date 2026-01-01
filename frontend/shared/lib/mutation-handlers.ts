@@ -1,35 +1,25 @@
-import { getErrorMessage } from "./errors";
-
-type ErrorResponse = {
-  error: {
-    details?: Array<{
-      reason?: string;
-      metadata?: Record<string, string>;
-    }>;
-  };
-};
-
-type ApiResponse = {
-  status: number;
-  data: ErrorResponse;
-};
+import { getErrorMessage, isApiError } from "./errors";
 
 type MutationHandlers<TFieldErrors> = {
   setErrorMessage: (message: string) => void;
   setFieldErrors: (errors: TFieldErrors) => void;
   extractFieldErrors: (metadata: Record<string, string>) => TFieldErrors;
-  onSuccess?: () => void;
   clearPassword?: () => void;
 };
 
-export function handleMutationError<TFieldErrors>(res: ApiResponse, handlers: MutationHandlers<TFieldErrors>): void {
+export function handleMutationError<TFieldErrors>(error: unknown, handlers: MutationHandlers<TFieldErrors>): void {
   const { setErrorMessage, setFieldErrors, extractFieldErrors, clearPassword } = handlers;
 
-  const details = res.data.error?.details?.[0];
-  const metadata = details?.metadata;
-  const reason = details?.reason;
+  // ネットワークエラーなど
+  if (!isApiError(error)) {
+    setErrorMessage(getErrorMessage("CONNECTION_ERROR"));
+    clearPassword?.();
+    return;
+  }
 
-  if (res.status === 400) {
+  const { status, metadata, reason } = error;
+
+  if (status === 400) {
     if (metadata) {
       setFieldErrors(extractFieldErrors(metadata));
     } else {
@@ -37,13 +27,9 @@ export function handleMutationError<TFieldErrors>(res: ApiResponse, handlers: Mu
     }
   }
 
-  if (res.status === 401 || res.status === 409 || res.status === 500) {
+  if (status === 401 || status === 409 || status === 500) {
     setErrorMessage(getErrorMessage(reason));
   }
 
   clearPassword?.();
-}
-
-export function handleNetworkError(setErrorMessage: (message: string) => void): void {
-  setErrorMessage(getErrorMessage("CONNECTION_ERROR"));
 }

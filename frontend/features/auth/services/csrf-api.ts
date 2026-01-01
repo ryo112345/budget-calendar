@@ -1,17 +1,14 @@
 import { getCsrf } from "~/apis/csrf/csrf";
-import { getErrorMessage } from "~/shared/lib/errors";
+import { getErrorMessage, isApiError } from "~/shared/lib/errors";
 
 export async function getCsrfToken() {
-  let res;
   try {
-    res = await getCsrf();
-  } catch {
+    const res = await getCsrf();
+    return res.csrfToken;
+  } catch (error) {
+    if (isApiError(error)) {
+      throw new Error(getErrorMessage(error.reason));
+    }
     throw new Error(getErrorMessage("CONNECTION_ERROR"));
   }
-
-  if (res.status === 500) {
-    throw new Error(getErrorMessage(res.data.error.details?.[0]?.reason));
-  }
-
-  return res.data.csrfToken;
 }

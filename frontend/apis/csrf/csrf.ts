@@ -28,31 +28,12 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * CSRFトークンを取得（認証不要）
  * @summary Get Csrf
  */
-export type getCsrfResponse200 = {
-  data: CsrfResponse;
-  status: 200;
-};
-
-export type getCsrfResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type getCsrfResponseSuccess = getCsrfResponse200 & {
-  headers: Headers;
-};
-export type getCsrfResponseError = getCsrfResponse500 & {
-  headers: Headers;
-};
-
-export type getCsrfResponse = getCsrfResponseSuccess | getCsrfResponseError;
-
 export const getGetCsrfUrl = () => {
   return `/csrf`;
 };
 
-export const getCsrf = async (options?: RequestInit): Promise<getCsrfResponse> => {
-  return customFetch<getCsrfResponse>(getGetCsrfUrl(), {
+export const getCsrf = async (options?: RequestInit): Promise<CsrfResponse> => {
+  return customFetch<CsrfResponse>(getGetCsrfUrl(), {
     ...options,
     method: "GET",
   });

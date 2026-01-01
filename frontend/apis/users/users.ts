@@ -38,22 +38,12 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * ログイン状態確認
  * @summary User CheckSignedIn
  */
-export type getUsersCheckSignedInResponse200 = {
-  data: UserUserCheckSignedInResponse;
-  status: 200;
-};
-
-export type getUsersCheckSignedInResponseSuccess = getUsersCheckSignedInResponse200 & {
-  headers: Headers;
-};
-export type getUsersCheckSignedInResponse = getUsersCheckSignedInResponseSuccess;
-
 export const getGetUsersCheckSignedInUrl = () => {
   return `/users/checkSignedIn`;
 };
 
-export const getUsersCheckSignedIn = async (options?: RequestInit): Promise<getUsersCheckSignedInResponse> => {
-  return customFetch<getUsersCheckSignedInResponse>(getGetUsersCheckSignedInUrl(), {
+export const getUsersCheckSignedIn = async (options?: RequestInit): Promise<UserUserCheckSignedInResponse> => {
+  return customFetch<UserUserCheckSignedInResponse>(getGetUsersCheckSignedInUrl(), {
     ...options,
     method: "GET",
   });
@@ -135,41 +125,12 @@ export function useGetUsersCheckSignedIn<TData = Awaited<ReturnType<typeof getUs
  * ユーザーログイン
  * @summary User SignIn
  */
-export type postUsersSignInResponse200 = {
-  data: UserUserSignInResponse;
-  status: 200;
-};
-
-export type postUsersSignInResponse400 = {
-  data: ErrorBody;
-  status: 400;
-};
-
-export type postUsersSignInResponse401 = {
-  data: ErrorBody;
-  status: 401;
-};
-
-export type postUsersSignInResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type postUsersSignInResponseSuccess = postUsersSignInResponse200 & {
-  headers: Headers;
-};
-export type postUsersSignInResponseError = (postUsersSignInResponse400 | postUsersSignInResponse401 | postUsersSignInResponse500) & {
-  headers: Headers;
-};
-
-export type postUsersSignInResponse = postUsersSignInResponseSuccess | postUsersSignInResponseError;
-
 export const getPostUsersSignInUrl = () => {
   return `/users/signIn`;
 };
 
-export const postUsersSignIn = async (userSignInInput: UserSignInInput, options?: RequestInit): Promise<postUsersSignInResponse> => {
-  return customFetch<postUsersSignInResponse>(getPostUsersSignInUrl(), {
+export const postUsersSignIn = async (userSignInInput: UserSignInInput, options?: RequestInit): Promise<UserUserSignInResponse> => {
+  return customFetch<UserUserSignInResponse>(getPostUsersSignInUrl(), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },
@@ -219,41 +180,12 @@ export const usePostUsersSignIn = <TError = ErrorBody | ErrorBody | ErrorBody, T
  * ユーザー登録
  * @summary User SignUp
  */
-export type postUsersSignUpResponse200 = {
-  data: UserUserSignUpResponse;
-  status: 200;
-};
-
-export type postUsersSignUpResponse400 = {
-  data: ErrorBody;
-  status: 400;
-};
-
-export type postUsersSignUpResponse409 = {
-  data: ErrorBody;
-  status: 409;
-};
-
-export type postUsersSignUpResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type postUsersSignUpResponseSuccess = postUsersSignUpResponse200 & {
-  headers: Headers;
-};
-export type postUsersSignUpResponseError = (postUsersSignUpResponse400 | postUsersSignUpResponse409 | postUsersSignUpResponse500) & {
-  headers: Headers;
-};
-
-export type postUsersSignUpResponse = postUsersSignUpResponseSuccess | postUsersSignUpResponseError;
-
 export const getPostUsersSignUpUrl = () => {
   return `/users/signUp`;
 };
 
-export const postUsersSignUp = async (userSignUpInput: UserSignUpInput, options?: RequestInit): Promise<postUsersSignUpResponse> => {
-  return customFetch<postUsersSignUpResponse>(getPostUsersSignUpUrl(), {
+export const postUsersSignUp = async (userSignUpInput: UserSignUpInput, options?: RequestInit): Promise<UserUserSignUpResponse> => {
+  return customFetch<UserUserSignUpResponse>(getPostUsersSignUpUrl(), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },

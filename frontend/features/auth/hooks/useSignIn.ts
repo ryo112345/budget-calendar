@@ -4,7 +4,7 @@ import type { UserSignInInput } from "~/apis/model";
 import { usePostUsersSignIn } from "~/apis/users/users";
 import { NAVIGATION_PAGE_LIST } from "~/app/routes";
 import { invalidateAuthCache } from "../services/cache";
-import { handleMutationError, handleNetworkError } from "~/shared/lib/mutation-handlers";
+import { handleMutationError } from "~/shared/lib/mutation-handlers";
 
 type SignInFieldErrors = {
   email?: string;
@@ -36,15 +36,13 @@ export const useSignIn = () => {
 
   const { mutate } = usePostUsersSignIn({
     mutation: {
-      onSuccess: (res) => {
-        if (res.status === 200) {
-          invalidateAuthCache();
-          window.alert("ログインしました");
-          navigate(NAVIGATION_PAGE_LIST.calendarPage);
-          return;
-        }
-
-        handleMutationError(res, {
+      onSuccess: () => {
+        invalidateAuthCache();
+        window.alert("ログインしました");
+        navigate(NAVIGATION_PAGE_LIST.calendarPage);
+      },
+      onError: (error) => {
+        handleMutationError(error, {
           setErrorMessage,
           setFieldErrors,
           extractFieldErrors: (metadata) => ({
@@ -54,7 +52,6 @@ export const useSignIn = () => {
           clearPassword: () => updateSignInInput({ password: "" }),
         });
       },
-      onError: () => handleNetworkError(setErrorMessage),
     },
   });
 

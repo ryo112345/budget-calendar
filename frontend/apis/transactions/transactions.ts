@@ -40,30 +40,6 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * ユーザーに紐づく取引一覧を取得。クエリパラメータでフィルタリング可能
  * @summary Get Transactions
  */
-export type getTransactionsResponse200 = {
-  data: FetchTransactionListResponse;
-  status: 200;
-};
-
-export type getTransactionsResponse400 = {
-  data: ErrorBody;
-  status: 400;
-};
-
-export type getTransactionsResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type getTransactionsResponseSuccess = getTransactionsResponse200 & {
-  headers: Headers;
-};
-export type getTransactionsResponseError = (getTransactionsResponse400 | getTransactionsResponse500) & {
-  headers: Headers;
-};
-
-export type getTransactionsResponse = getTransactionsResponseSuccess | getTransactionsResponseError;
-
 export const getGetTransactionsUrl = (params?: GetTransactionsParams) => {
   const normalizedParams = new URLSearchParams();
 
@@ -78,8 +54,8 @@ export const getGetTransactionsUrl = (params?: GetTransactionsParams) => {
   return stringifiedParams.length > 0 ? `/transactions?${stringifiedParams}` : `/transactions`;
 };
 
-export const getTransactions = async (params?: GetTransactionsParams, options?: RequestInit): Promise<getTransactionsResponse> => {
-  return customFetch<getTransactionsResponse>(getGetTransactionsUrl(params), {
+export const getTransactions = async (params?: GetTransactionsParams, options?: RequestInit): Promise<FetchTransactionListResponse> => {
+  return customFetch<FetchTransactionListResponse>(getGetTransactionsUrl(params), {
     ...options,
     method: "GET",
   });
@@ -167,36 +143,12 @@ export function useGetTransactions<TData = Awaited<ReturnType<typeof getTransact
  * 新しい取引を作成
  * @summary Create Transaction
  */
-export type postTransactionsResponse201 = {
-  data: CreateTransactionResponse;
-  status: 201;
-};
-
-export type postTransactionsResponse400 = {
-  data: ErrorBody;
-  status: 400;
-};
-
-export type postTransactionsResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type postTransactionsResponseSuccess = postTransactionsResponse201 & {
-  headers: Headers;
-};
-export type postTransactionsResponseError = (postTransactionsResponse400 | postTransactionsResponse500) & {
-  headers: Headers;
-};
-
-export type postTransactionsResponse = postTransactionsResponseSuccess | postTransactionsResponseError;
-
 export const getPostTransactionsUrl = () => {
   return `/transactions`;
 };
 
-export const postTransactions = async (createTransactionInput: CreateTransactionInput, options?: RequestInit): Promise<postTransactionsResponse> => {
-  return customFetch<postTransactionsResponse>(getPostTransactionsUrl(), {
+export const postTransactions = async (createTransactionInput: CreateTransactionInput, options?: RequestInit): Promise<CreateTransactionResponse> => {
+  return customFetch<CreateTransactionResponse>(getPostTransactionsUrl(), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },
@@ -246,41 +198,12 @@ export const usePostTransactions = <TError = ErrorBody | ErrorBody, TContext = u
  * 取引の詳細を取得
  * @summary Get Transaction
  */
-export type getTransactionsIdResponse200 = {
-  data: FetchTransactionResponse;
-  status: 200;
-};
-
-export type getTransactionsIdResponse400 = {
-  data: ErrorBody;
-  status: 400;
-};
-
-export type getTransactionsIdResponse404 = {
-  data: ErrorBody;
-  status: 404;
-};
-
-export type getTransactionsIdResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type getTransactionsIdResponseSuccess = getTransactionsIdResponse200 & {
-  headers: Headers;
-};
-export type getTransactionsIdResponseError = (getTransactionsIdResponse400 | getTransactionsIdResponse404 | getTransactionsIdResponse500) & {
-  headers: Headers;
-};
-
-export type getTransactionsIdResponse = getTransactionsIdResponseSuccess | getTransactionsIdResponseError;
-
 export const getGetTransactionsIdUrl = (id: number) => {
   return `/transactions/${id}`;
 };
 
-export const getTransactionsId = async (id: number, options?: RequestInit): Promise<getTransactionsIdResponse> => {
-  return customFetch<getTransactionsIdResponse>(getGetTransactionsIdUrl(id), {
+export const getTransactionsId = async (id: number, options?: RequestInit): Promise<FetchTransactionResponse> => {
+  return customFetch<FetchTransactionResponse>(getGetTransactionsIdUrl(id), {
     ...options,
     method: "GET",
   });
@@ -368,35 +291,6 @@ export function useGetTransactionsId<TData = Awaited<ReturnType<typeof getTransa
  * 取引を更新（部分更新）
  * @summary Update Transaction
  */
-export type patchTransactionsIdResponse200 = {
-  data: UpdateTransactionResponse;
-  status: 200;
-};
-
-export type patchTransactionsIdResponse400 = {
-  data: ErrorBody;
-  status: 400;
-};
-
-export type patchTransactionsIdResponse404 = {
-  data: ErrorBody;
-  status: 404;
-};
-
-export type patchTransactionsIdResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type patchTransactionsIdResponseSuccess = patchTransactionsIdResponse200 & {
-  headers: Headers;
-};
-export type patchTransactionsIdResponseError = (patchTransactionsIdResponse400 | patchTransactionsIdResponse404 | patchTransactionsIdResponse500) & {
-  headers: Headers;
-};
-
-export type patchTransactionsIdResponse = patchTransactionsIdResponseSuccess | patchTransactionsIdResponseError;
-
 export const getPatchTransactionsIdUrl = (id: number) => {
   return `/transactions/${id}`;
 };
@@ -405,8 +299,8 @@ export const patchTransactionsId = async (
   id: number,
   updateTransactionInput: UpdateTransactionInput,
   options?: RequestInit,
-): Promise<patchTransactionsIdResponse> => {
-  return customFetch<patchTransactionsIdResponse>(getPatchTransactionsIdUrl(id), {
+): Promise<UpdateTransactionResponse> => {
+  return customFetch<UpdateTransactionResponse>(getPatchTransactionsIdUrl(id), {
     ...options,
     method: "PATCH",
     headers: { "Content-Type": "application/json", ...options?.headers },
@@ -456,36 +350,12 @@ export const usePatchTransactionsId = <TError = ErrorBody | ErrorBody | ErrorBod
  * 取引を削除
  * @summary Delete Transaction
  */
-export type deleteTransactionsIdResponse204 = {
-  data: void;
-  status: 204;
-};
-
-export type deleteTransactionsIdResponse404 = {
-  data: ErrorBody;
-  status: 404;
-};
-
-export type deleteTransactionsIdResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type deleteTransactionsIdResponseSuccess = deleteTransactionsIdResponse204 & {
-  headers: Headers;
-};
-export type deleteTransactionsIdResponseError = (deleteTransactionsIdResponse404 | deleteTransactionsIdResponse500) & {
-  headers: Headers;
-};
-
-export type deleteTransactionsIdResponse = deleteTransactionsIdResponseSuccess | deleteTransactionsIdResponseError;
-
 export const getDeleteTransactionsIdUrl = (id: number) => {
   return `/transactions/${id}`;
 };
 
-export const deleteTransactionsId = async (id: number, options?: RequestInit): Promise<deleteTransactionsIdResponse> => {
-  return customFetch<deleteTransactionsIdResponse>(getDeleteTransactionsIdUrl(id), {
+export const deleteTransactionsId = async (id: number, options?: RequestInit): Promise<void> => {
+  return customFetch<void>(getDeleteTransactionsIdUrl(id), {
     ...options,
     method: "DELETE",
   });

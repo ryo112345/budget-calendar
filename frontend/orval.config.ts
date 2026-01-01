@@ -11,6 +11,9 @@ const config = {
       clean: true,
       target: "./apis",
       override: {
+        fetch: {
+          includeHttpResponseReturnType: false,
+        },
         mutator: {
           path: "./shared/lib/fetch.ts",
           name: "customFetch",

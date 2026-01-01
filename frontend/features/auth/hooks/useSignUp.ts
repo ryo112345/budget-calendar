@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import type { UserSignUpInput } from "~/apis/model";
 import { usePostUsersSignUp } from "~/apis/users/users";
 import { NAVIGATION_PAGE_LIST } from "~/app/routes";
-import { handleMutationError, handleNetworkError } from "~/shared/lib/mutation-handlers";
+import { handleMutationError } from "~/shared/lib/mutation-handlers";
 
 type FieldErrors = {
   name?: string;
@@ -37,14 +37,12 @@ export const useSignUp = () => {
 
   const { mutate } = usePostUsersSignUp({
     mutation: {
-      onSuccess: (res) => {
-        if (res.status === 200) {
-          window.alert("会員登録が完了しました");
-          navigate(NAVIGATION_PAGE_LIST.signInPage);
-          return;
-        }
-
-        handleMutationError(res, {
+      onSuccess: () => {
+        window.alert("会員登録が完了しました");
+        navigate(NAVIGATION_PAGE_LIST.signInPage);
+      },
+      onError: (error) => {
+        handleMutationError(error, {
           setErrorMessage,
           setFieldErrors,
           extractFieldErrors: (metadata) => ({
@@ -55,7 +53,6 @@ export const useSignUp = () => {
           clearPassword: () => updateSignUpInput({ password: "" }),
         });
       },
-      onError: () => handleNetworkError(setErrorMessage),
     },
   });
 

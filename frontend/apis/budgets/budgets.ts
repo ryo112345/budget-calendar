@@ -40,30 +40,6 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * ユーザーに紐づく予算一覧を取得。クエリパラメータでフィルタリング可能
  * @summary Get Budgets
  */
-export type getBudgetsResponse200 = {
-  data: FetchBudgetListResponse;
-  status: 200;
-};
-
-export type getBudgetsResponse400 = {
-  data: ErrorBody;
-  status: 400;
-};
-
-export type getBudgetsResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type getBudgetsResponseSuccess = getBudgetsResponse200 & {
-  headers: Headers;
-};
-export type getBudgetsResponseError = (getBudgetsResponse400 | getBudgetsResponse500) & {
-  headers: Headers;
-};
-
-export type getBudgetsResponse = getBudgetsResponseSuccess | getBudgetsResponseError;
-
 export const getGetBudgetsUrl = (params?: GetBudgetsParams) => {
   const normalizedParams = new URLSearchParams();
 
@@ -78,8 +54,8 @@ export const getGetBudgetsUrl = (params?: GetBudgetsParams) => {
   return stringifiedParams.length > 0 ? `/budgets?${stringifiedParams}` : `/budgets`;
 };
 
-export const getBudgets = async (params?: GetBudgetsParams, options?: RequestInit): Promise<getBudgetsResponse> => {
-  return customFetch<getBudgetsResponse>(getGetBudgetsUrl(params), {
+export const getBudgets = async (params?: GetBudgetsParams, options?: RequestInit): Promise<FetchBudgetListResponse> => {
+  return customFetch<FetchBudgetListResponse>(getGetBudgetsUrl(params), {
     ...options,
     method: "GET",
   });
@@ -161,41 +137,12 @@ export function useGetBudgets<TData = Awaited<ReturnType<typeof getBudgets>>, TE
  * 新しい予算を作成
  * @summary Create Budget
  */
-export type postBudgetsResponse201 = {
-  data: CreateBudgetResponse;
-  status: 201;
-};
-
-export type postBudgetsResponse400 = {
-  data: ErrorBody;
-  status: 400;
-};
-
-export type postBudgetsResponse409 = {
-  data: ErrorBody;
-  status: 409;
-};
-
-export type postBudgetsResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type postBudgetsResponseSuccess = postBudgetsResponse201 & {
-  headers: Headers;
-};
-export type postBudgetsResponseError = (postBudgetsResponse400 | postBudgetsResponse409 | postBudgetsResponse500) & {
-  headers: Headers;
-};
-
-export type postBudgetsResponse = postBudgetsResponseSuccess | postBudgetsResponseError;
-
 export const getPostBudgetsUrl = () => {
   return `/budgets`;
 };
 
-export const postBudgets = async (createBudgetInput: CreateBudgetInput, options?: RequestInit): Promise<postBudgetsResponse> => {
-  return customFetch<postBudgetsResponse>(getPostBudgetsUrl(), {
+export const postBudgets = async (createBudgetInput: CreateBudgetInput, options?: RequestInit): Promise<CreateBudgetResponse> => {
+  return customFetch<CreateBudgetResponse>(getPostBudgetsUrl(), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },
@@ -245,41 +192,12 @@ export const usePostBudgets = <TError = ErrorBody | ErrorBody | ErrorBody, TCont
  * 予算の詳細を取得
  * @summary Get Budget
  */
-export type getBudgetsIdResponse200 = {
-  data: FetchBudgetResponse;
-  status: 200;
-};
-
-export type getBudgetsIdResponse400 = {
-  data: ErrorBody;
-  status: 400;
-};
-
-export type getBudgetsIdResponse404 = {
-  data: ErrorBody;
-  status: 404;
-};
-
-export type getBudgetsIdResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type getBudgetsIdResponseSuccess = getBudgetsIdResponse200 & {
-  headers: Headers;
-};
-export type getBudgetsIdResponseError = (getBudgetsIdResponse400 | getBudgetsIdResponse404 | getBudgetsIdResponse500) & {
-  headers: Headers;
-};
-
-export type getBudgetsIdResponse = getBudgetsIdResponseSuccess | getBudgetsIdResponseError;
-
 export const getGetBudgetsIdUrl = (id: number) => {
   return `/budgets/${id}`;
 };
 
-export const getBudgetsId = async (id: number, options?: RequestInit): Promise<getBudgetsIdResponse> => {
-  return customFetch<getBudgetsIdResponse>(getGetBudgetsIdUrl(id), {
+export const getBudgetsId = async (id: number, options?: RequestInit): Promise<FetchBudgetResponse> => {
+  return customFetch<FetchBudgetResponse>(getGetBudgetsIdUrl(id), {
     ...options,
     method: "GET",
   });
@@ -361,51 +279,12 @@ export function useGetBudgetsId<TData = Awaited<ReturnType<typeof getBudgetsId>>
  * 予算を更新（部分更新）
  * @summary Update Budget
  */
-export type patchBudgetsIdResponse200 = {
-  data: UpdateBudgetResponse;
-  status: 200;
-};
-
-export type patchBudgetsIdResponse400 = {
-  data: ErrorBody;
-  status: 400;
-};
-
-export type patchBudgetsIdResponse404 = {
-  data: ErrorBody;
-  status: 404;
-};
-
-export type patchBudgetsIdResponse409 = {
-  data: ErrorBody;
-  status: 409;
-};
-
-export type patchBudgetsIdResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type patchBudgetsIdResponseSuccess = patchBudgetsIdResponse200 & {
-  headers: Headers;
-};
-export type patchBudgetsIdResponseError = (
-  | patchBudgetsIdResponse400
-  | patchBudgetsIdResponse404
-  | patchBudgetsIdResponse409
-  | patchBudgetsIdResponse500
-) & {
-  headers: Headers;
-};
-
-export type patchBudgetsIdResponse = patchBudgetsIdResponseSuccess | patchBudgetsIdResponseError;
-
 export const getPatchBudgetsIdUrl = (id: number) => {
   return `/budgets/${id}`;
 };
 
-export const patchBudgetsId = async (id: number, updateBudgetInput: UpdateBudgetInput, options?: RequestInit): Promise<patchBudgetsIdResponse> => {
-  return customFetch<patchBudgetsIdResponse>(getPatchBudgetsIdUrl(id), {
+export const patchBudgetsId = async (id: number, updateBudgetInput: UpdateBudgetInput, options?: RequestInit): Promise<UpdateBudgetResponse> => {
+  return customFetch<UpdateBudgetResponse>(getPatchBudgetsIdUrl(id), {
     ...options,
     method: "PATCH",
     headers: { "Content-Type": "application/json", ...options?.headers },
@@ -455,36 +334,12 @@ export const usePatchBudgetsId = <TError = ErrorBody | ErrorBody | ErrorBody | E
  * 予算を削除
  * @summary Delete Budget
  */
-export type deleteBudgetsIdResponse204 = {
-  data: void;
-  status: 204;
-};
-
-export type deleteBudgetsIdResponse404 = {
-  data: ErrorBody;
-  status: 404;
-};
-
-export type deleteBudgetsIdResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type deleteBudgetsIdResponseSuccess = deleteBudgetsIdResponse204 & {
-  headers: Headers;
-};
-export type deleteBudgetsIdResponseError = (deleteBudgetsIdResponse404 | deleteBudgetsIdResponse500) & {
-  headers: Headers;
-};
-
-export type deleteBudgetsIdResponse = deleteBudgetsIdResponseSuccess | deleteBudgetsIdResponseError;
-
 export const getDeleteBudgetsIdUrl = (id: number) => {
   return `/budgets/${id}`;
 };
 
-export const deleteBudgetsId = async (id: number, options?: RequestInit): Promise<deleteBudgetsIdResponse> => {
-  return customFetch<deleteBudgetsIdResponse>(getDeleteBudgetsIdUrl(id), {
+export const deleteBudgetsId = async (id: number, options?: RequestInit): Promise<void> => {
+  return customFetch<void>(getDeleteBudgetsIdUrl(id), {
     ...options,
     method: "DELETE",
   });

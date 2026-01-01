@@ -39,31 +39,12 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * ユーザーに紐づくカテゴリ一覧を取得
  * @summary Get Categories
  */
-export type getCategoriesResponse200 = {
-  data: FetchCategoryListsResponse;
-  status: 200;
-};
-
-export type getCategoriesResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type getCategoriesResponseSuccess = getCategoriesResponse200 & {
-  headers: Headers;
-};
-export type getCategoriesResponseError = getCategoriesResponse500 & {
-  headers: Headers;
-};
-
-export type getCategoriesResponse = getCategoriesResponseSuccess | getCategoriesResponseError;
-
 export const getGetCategoriesUrl = () => {
   return `/categories`;
 };
 
-export const getCategories = async (options?: RequestInit): Promise<getCategoriesResponse> => {
-  return customFetch<getCategoriesResponse>(getGetCategoriesUrl(), {
+export const getCategories = async (options?: RequestInit): Promise<FetchCategoryListsResponse> => {
+  return customFetch<FetchCategoryListsResponse>(getGetCategoriesUrl(), {
     ...options,
     method: "GET",
   });
@@ -138,36 +119,12 @@ export function useGetCategories<TData = Awaited<ReturnType<typeof getCategories
  * 新しいカテゴリを作成
  * @summary Create Category
  */
-export type postCategoriesResponse201 = {
-  data: CreateCategoryResponse;
-  status: 201;
-};
-
-export type postCategoriesResponse400 = {
-  data: ErrorBody;
-  status: 400;
-};
-
-export type postCategoriesResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type postCategoriesResponseSuccess = postCategoriesResponse201 & {
-  headers: Headers;
-};
-export type postCategoriesResponseError = (postCategoriesResponse400 | postCategoriesResponse500) & {
-  headers: Headers;
-};
-
-export type postCategoriesResponse = postCategoriesResponseSuccess | postCategoriesResponseError;
-
 export const getPostCategoriesUrl = () => {
   return `/categories`;
 };
 
-export const postCategories = async (createCategoryInput: CreateCategoryInput, options?: RequestInit): Promise<postCategoriesResponse> => {
-  return customFetch<postCategoriesResponse>(getPostCategoriesUrl(), {
+export const postCategories = async (createCategoryInput: CreateCategoryInput, options?: RequestInit): Promise<CreateCategoryResponse> => {
+  return customFetch<CreateCategoryResponse>(getPostCategoriesUrl(), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },
@@ -217,41 +174,12 @@ export const usePostCategories = <TError = ErrorBody | ErrorBody, TContext = unk
  * カテゴリの詳細を取得
  * @summary Get Category
  */
-export type getCategoriesIdResponse200 = {
-  data: FetchCategoryResponse;
-  status: 200;
-};
-
-export type getCategoriesIdResponse400 = {
-  data: ErrorBody;
-  status: 400;
-};
-
-export type getCategoriesIdResponse404 = {
-  data: ErrorBody;
-  status: 404;
-};
-
-export type getCategoriesIdResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type getCategoriesIdResponseSuccess = getCategoriesIdResponse200 & {
-  headers: Headers;
-};
-export type getCategoriesIdResponseError = (getCategoriesIdResponse400 | getCategoriesIdResponse404 | getCategoriesIdResponse500) & {
-  headers: Headers;
-};
-
-export type getCategoriesIdResponse = getCategoriesIdResponseSuccess | getCategoriesIdResponseError;
-
 export const getGetCategoriesIdUrl = (id: number) => {
   return `/categories/${id}`;
 };
 
-export const getCategoriesId = async (id: number, options?: RequestInit): Promise<getCategoriesIdResponse> => {
-  return customFetch<getCategoriesIdResponse>(getGetCategoriesIdUrl(id), {
+export const getCategoriesId = async (id: number, options?: RequestInit): Promise<FetchCategoryResponse> => {
+  return customFetch<FetchCategoryResponse>(getGetCategoriesIdUrl(id), {
     ...options,
     method: "GET",
   });
@@ -339,35 +267,6 @@ export function useGetCategoriesId<TData = Awaited<ReturnType<typeof getCategori
  * カテゴリを更新（部分更新）
  * @summary Update Category
  */
-export type patchCategoriesIdResponse200 = {
-  data: UpdateCategoryResponse;
-  status: 200;
-};
-
-export type patchCategoriesIdResponse400 = {
-  data: ErrorBody;
-  status: 400;
-};
-
-export type patchCategoriesIdResponse404 = {
-  data: ErrorBody;
-  status: 404;
-};
-
-export type patchCategoriesIdResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type patchCategoriesIdResponseSuccess = patchCategoriesIdResponse200 & {
-  headers: Headers;
-};
-export type patchCategoriesIdResponseError = (patchCategoriesIdResponse400 | patchCategoriesIdResponse404 | patchCategoriesIdResponse500) & {
-  headers: Headers;
-};
-
-export type patchCategoriesIdResponse = patchCategoriesIdResponseSuccess | patchCategoriesIdResponseError;
-
 export const getPatchCategoriesIdUrl = (id: number) => {
   return `/categories/${id}`;
 };
@@ -376,8 +275,8 @@ export const patchCategoriesId = async (
   id: number,
   updateCategoryInput: UpdateCategoryInput,
   options?: RequestInit,
-): Promise<patchCategoriesIdResponse> => {
-  return customFetch<patchCategoriesIdResponse>(getPatchCategoriesIdUrl(id), {
+): Promise<UpdateCategoryResponse> => {
+  return customFetch<UpdateCategoryResponse>(getPatchCategoriesIdUrl(id), {
     ...options,
     method: "PATCH",
     headers: { "Content-Type": "application/json", ...options?.headers },
@@ -427,41 +326,12 @@ export const usePatchCategoriesId = <TError = ErrorBody | ErrorBody | ErrorBody,
  * カテゴリを削除
  * @summary Delete Category
  */
-export type deleteCategoriesIdResponse204 = {
-  data: void;
-  status: 204;
-};
-
-export type deleteCategoriesIdResponse400 = {
-  data: ErrorBody;
-  status: 400;
-};
-
-export type deleteCategoriesIdResponse404 = {
-  data: ErrorBody;
-  status: 404;
-};
-
-export type deleteCategoriesIdResponse500 = {
-  data: ErrorBody;
-  status: 500;
-};
-
-export type deleteCategoriesIdResponseSuccess = deleteCategoriesIdResponse204 & {
-  headers: Headers;
-};
-export type deleteCategoriesIdResponseError = (deleteCategoriesIdResponse400 | deleteCategoriesIdResponse404 | deleteCategoriesIdResponse500) & {
-  headers: Headers;
-};
-
-export type deleteCategoriesIdResponse = deleteCategoriesIdResponseSuccess | deleteCategoriesIdResponseError;
-
 export const getDeleteCategoriesIdUrl = (id: number) => {
   return `/categories/${id}`;
 };
 
-export const deleteCategoriesId = async (id: number, options?: RequestInit): Promise<deleteCategoriesIdResponse> => {
-  return customFetch<deleteCategoriesIdResponse>(getDeleteCategoriesIdUrl(id), {
+export const deleteCategoriesId = async (id: number, options?: RequestInit): Promise<void> => {
+  return customFetch<void>(getDeleteCategoriesIdUrl(id), {
     ...options,
     method: "DELETE",
   });
