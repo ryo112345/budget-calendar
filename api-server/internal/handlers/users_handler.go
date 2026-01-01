@@ -45,7 +45,7 @@ func (uh *usersHandler) PostUsersSignUp(ctx context.Context, request api.PostUse
 					Details: &[]api.ErrorInfo{
 						{
 							Type:     api.ErrorInfoTypeErrorInfo,
-							Reason:   api.INVALIDEMAIL,
+							Reason:   api.VALIDATIONERROR,
 							Domain:   "budget-calendar.example.com",
 							Metadata: &metadata,
 						},
@@ -108,7 +108,7 @@ func (uh *usersHandler) PostUsersSignIn(ctx context.Context, request api.PostUse
 					Details: &[]api.ErrorInfo{
 						{
 							Type:     api.ErrorInfoTypeErrorInfo,
-							Reason:   api.INVALIDEMAIL,
+							Reason:   api.VALIDATIONERROR,
 							Domain:   "budget-calendar.example.com",
 							Metadata: &metadata,
 						},

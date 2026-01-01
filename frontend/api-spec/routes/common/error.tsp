@@ -86,6 +86,9 @@ enum ErrorReason {
 
   @doc("不明なエラー - 推奨メッセージ: 予期しないエラーが発生しました")
   UNKNOWN_ERROR: "UNKNOWN_ERROR",
+
+  @doc("バリデーションエラー - 推奨メッセージ: 入力内容に誤りがあります（metadataに詳細を含む）")
+  VALIDATION_ERROR: "VALIDATION_ERROR",
 }
 
 @doc("エラー詳細情報")

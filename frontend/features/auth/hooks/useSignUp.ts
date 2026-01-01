@@ -37,10 +37,6 @@ export const useSignUp = () => {
 
   const { mutate } = usePostUsersSignUp({
     mutation: {
-      onMutate: () => {
-        setErrorMessage("");
-        setFieldErrors({});
-      },
       onSuccess: (res) => {
         if (res.status === 200) {
           window.alert("会員登録が完了しました");

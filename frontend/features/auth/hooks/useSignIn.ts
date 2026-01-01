@@ -36,10 +36,6 @@ export const useSignIn = () => {
 
   const { mutate } = usePostUsersSignIn({
     mutation: {
-      onMutate: () => {
-        setErrorMessage("");
-        setFieldErrors({});
-      },
       onSuccess: (res) => {
         if (res.status === 200) {
           invalidateAuthCache();

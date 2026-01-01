@@ -36,7 +36,6 @@ func ValidateSignIn(input *api.UserSignInInput) error {
 		validation.Field(
 			&input.Email,
 			validation.Required.Error("Emailは必須入力です。"),
-			is.Email.Error("Emailの形式での入力をお願いします。"),
 		),
 		validation.Field(
 			&input.Password,

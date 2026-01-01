@@ -87,7 +87,7 @@ func (h *budgetsHandler) PostBudgets(ctx context.Context, request api.PostBudget
 					Details: &[]api.ErrorInfo{
 						{
 							Type:     api.ErrorInfoTypeErrorInfo,
-							Reason:   api.INVALIDBUDGETAMOUNT,
+							Reason:   api.VALIDATIONERROR,
 							Domain:   "budget-calendar.example.com",
 							Metadata: &metadata,
 						},
@@ -214,7 +214,7 @@ func (h *budgetsHandler) PatchBudgetsId(ctx context.Context, request api.PatchBu
 					Details: &[]api.ErrorInfo{
 						{
 							Type:     api.ErrorInfoTypeErrorInfo,
-							Reason:   api.INVALIDBUDGETAMOUNT,
+							Reason:   api.VALIDATIONERROR,
 							Domain:   "budget-calendar.example.com",
 							Metadata: &metadata,
 						},

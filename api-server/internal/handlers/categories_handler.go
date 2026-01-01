@@ -87,7 +87,7 @@ func (h *categoriesHandler) PostCategories(ctx context.Context, request api.Post
 					Details: &[]api.ErrorInfo{
 						{
 							Type:     api.ErrorInfoTypeErrorInfo,
-							Reason:   api.INVALIDCATEGORYNAME,
+							Reason:   api.VALIDATIONERROR,
 							Domain:   "budget-calendar.example.com",
 							Metadata: &metadata,
 						},
@@ -178,7 +178,7 @@ func (h *categoriesHandler) PatchCategoriesId(ctx context.Context, request api.P
 					Details: &[]api.ErrorInfo{
 						{
 							Type:     api.ErrorInfoTypeErrorInfo,
-							Reason:   api.INVALIDCATEGORYNAME,
+							Reason:   api.VALIDATIONERROR,
 							Domain:   "budget-calendar.example.com",
 							Metadata: &metadata,
 						},

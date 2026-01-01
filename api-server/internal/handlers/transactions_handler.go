@@ -88,7 +88,7 @@ func (h *transactionsHandler) PostTransactions(ctx context.Context, request api.
 					Details: &[]api.ErrorInfo{
 						{
 							Type:     api.ErrorInfoTypeErrorInfo,
-							Reason:   api.INVALIDAMOUNT,
+							Reason:   api.VALIDATIONERROR,
 							Domain:   "budget-calendar.example.com",
 							Metadata: &metadata,
 						},
@@ -197,7 +197,7 @@ func (h *transactionsHandler) PatchTransactionsId(ctx context.Context, request a
 					Details: &[]api.ErrorInfo{
 						{
 							Type:     api.ErrorInfoTypeErrorInfo,
-							Reason:   api.INVALIDAMOUNT,
+							Reason:   api.VALIDATIONERROR,
 							Domain:   "budget-calendar.example.com",
 							Metadata: &metadata,
 						},
