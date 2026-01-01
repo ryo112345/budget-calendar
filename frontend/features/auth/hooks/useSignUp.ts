@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 import type { UserSignUpInput } from "~/apis/model";
 import { usePostUsersSignUp } from "~/apis/users/users";
 import { NAVIGATION_PAGE_LIST } from "~/app/routes";
@@ -38,7 +39,7 @@ export const useSignUp = () => {
   const { mutate } = usePostUsersSignUp({
     mutation: {
       onSuccess: () => {
-        window.alert("会員登録が完了しました");
+        toast.success("会員登録が完了しました");
         navigate(NAVIGATION_PAGE_LIST.signInPage);
       },
       onError: (error) => {

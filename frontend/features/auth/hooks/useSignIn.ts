@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 import type { UserSignInInput } from "~/apis/model";
 import { usePostUsersSignIn } from "~/apis/users/users";
 import { NAVIGATION_PAGE_LIST } from "~/app/routes";
@@ -38,7 +39,7 @@ export const useSignIn = () => {
     mutation: {
       onSuccess: () => {
         invalidateAuthCache();
-        window.alert("ログインしました");
+        toast.success("ログインしました");
         navigate(NAVIGATION_PAGE_LIST.calendarPage);
       },
       onError: (error) => {
