@@ -20,6 +20,9 @@ type UsersHandler interface {
 	// User CheckSignedIn
 	// (GET /users/checkSignedIn)
 	GetUsersCheckSignedIn(ctx context.Context, request api.GetUsersCheckSignedInRequestObject) (api.GetUsersCheckSignedInResponseObject, error)
+	// User SignOut
+	// (POST /users/signOut)
+	PostUsersSignOut(ctx context.Context, request api.PostUsersSignOutRequestObject) (api.PostUsersSignOutResponseObject, error)
 }
 
 type usersHandler struct {
@@ -184,5 +187,35 @@ func (uh *usersHandler) GetUsersCheckSignedIn(ctx context.Context, request api.G
 
 	return api.GetUsersCheckSignedIn200JSONResponse{
 		IsSignedIn: uh.userService.ExistsUser(userID),
+	}, nil
+}
+
+func (uh *usersHandler) PostUsersSignOut(ctx context.Context, request api.PostUsersSignOutRequestObject) (api.PostUsersSignOutResponseObject, error) {
+	var sameSite http.SameSite
+	if os.Getenv("APP_ENV") == "production" {
+		sameSite = http.SameSiteNoneMode
+	} else {
+		sameSite = http.SameSiteDefaultMode
+	}
+
+	// NOTE: Cookieを削除（MaxAge: -1で即時削除）
+	cookie := &http.Cookie{
+		Name:     "token",
+		Value:    "",
+		MaxAge:   -1,
+		Path:     "/",
+		Domain:   os.Getenv("API_ORIGIN"),
+		SameSite: sameSite,
+		Secure:   os.Getenv("APP_ENV") == "production",
+		HttpOnly: true,
+	}
+
+	return api.PostUsersSignOut200JSONResponse{
+		Body: api.UserUserSignOutResponse{
+			Message: "ログアウトしました",
+		},
+		Headers: api.PostUsersSignOut200ResponseHeaders{
+			SetCookie: cookie.String(),
+		},
 	}, nil
 }

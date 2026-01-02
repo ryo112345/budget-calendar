@@ -1,10 +1,9 @@
 import { useCallback, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useRevalidator, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import type { UserSignInInput } from "~/apis/model";
 import { usePostUsersSignIn } from "~/apis/users/users";
 import { NAVIGATION_PAGE_LIST } from "~/app/routes";
-import { invalidateAuthCache } from "../services/cache";
 import { handleMutationError } from "~/shared/lib/mutation-handlers";
 
 type SignInFieldErrors = {
@@ -34,13 +33,18 @@ export const useSignIn = () => {
   );
 
   const navigate = useNavigate();
+  const revalidator = useRevalidator();
+  const [searchParams] = useSearchParams();
 
   const { mutate } = usePostUsersSignIn({
     mutation: {
       onSuccess: () => {
-        invalidateAuthCache();
+        // loaderを再実行して認証状態を更新
+        revalidator.revalidate();
         toast.success("ログインしました");
-        navigate(NAVIGATION_PAGE_LIST.calendarPage);
+        // クエリパラメータにredirectがあれば元のページに戻る
+        const redirectTo = searchParams.get("redirect");
+        navigate(redirectTo || NAVIGATION_PAGE_LIST.calendarPage);
       },
       onError: (error) => {
         handleMutationError(error, {

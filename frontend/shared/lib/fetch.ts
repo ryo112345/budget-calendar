@@ -1,5 +1,5 @@
-import { getAuthCache, invalidateAuthCache } from "~/features/auth/services/cache";
 import { ApiError, type ErrorResponseData } from "./errors";
+import { getCsrfToken } from "./csrf-store";
 
 const getUrl = (contextUrl: string): string => {
   const baseUrl = import.meta.env.VITE_API_ENDPOINT_URI;
@@ -15,10 +15,11 @@ const getUrl = (contextUrl: string): string => {
 export const customFetch = async <T>(url: string, options: RequestInit): Promise<T> => {
   const requestUrl = getUrl(url);
   const requestHeaders = new Headers(options.headers);
-  const authCache = getAuthCache();
 
-  if (authCache?.csrfToken && !requestHeaders.has("X-CSRF-Token")) {
-    requestHeaders.set("X-CSRF-Token", authCache.csrfToken);
+  // CSRFトークンをヘッダーに追加
+  const csrfToken = getCsrfToken();
+  if (csrfToken && !requestHeaders.has("X-CSRF-Token")) {
+    requestHeaders.set("X-CSRF-Token", csrfToken);
   }
 
   let body = options.body;
@@ -36,8 +37,9 @@ export const customFetch = async <T>(url: string, options: RequestInit): Promise
 
   const response = await fetch(requestUrl, requestInit);
 
-  if (response.status === 401) {
-    invalidateAuthCache();
+  // 204 No Contentの場合はボディがないのでそのまま返す
+  if (response.status === 204) {
+    return undefined as T;
   }
 
   const data = await response.json();

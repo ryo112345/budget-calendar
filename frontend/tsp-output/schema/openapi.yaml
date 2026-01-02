@@ -436,7 +436,6 @@ paths:
           description: 開始日（YYYY-MM-DD形式）
           schema:
             type: string
-            format: date
           explode: false
         - name: end_date
           in: query
@@ -444,7 +443,6 @@ paths:
           description: 終了日（YYYY-MM-DD形式）
           schema:
             type: string
-            format: date
           explode: false
         - name: type
           in: query
@@ -1005,6 +1003,7 @@ components:
       type: string
       enum:
         - INVALID_ARGUMENT
+        - FAILED_PRECONDITION
         - ALREADY_EXISTS
         - NOT_FOUND
         - PERMISSION_DENIED

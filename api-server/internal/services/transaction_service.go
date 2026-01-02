@@ -31,10 +31,10 @@ func (s *transactionService) FetchTransactions(userID uint, params *api.GetTrans
 
 	if params != nil {
 		if params.StartDate != nil {
-			query = query.Where("date >= ?", params.StartDate.Time)
+			query = query.Where("date >= ?", *params.StartDate)
 		}
 		if params.EndDate != nil {
-			query = query.Where("date <= ?", params.EndDate.Time)
+			query = query.Where("date <= ?", *params.EndDate)
 		}
 		if params.Type != nil {
 			query = query.Where("type = ?", string(*params.Type))
@@ -59,11 +59,6 @@ func (s *transactionService) FetchTransactionByID(id uint, userID uint) (*models
 
 func (s *transactionService) CreateTransaction(userID uint, input *api.CreateTransactionInput) (*models.Transaction, error) {
 	if err := validators.ValidateCreateTransaction(input); err != nil {
-		return nil, err
-	}
-
-	var category models.Category
-	if err := s.db.Where("id = ? AND user_id = ?", input.CategoryId, userID).First(&category).Error; err != nil {
 		return nil, err
 	}
 
@@ -105,10 +100,6 @@ func (s *transactionService) UpdateTransaction(id uint, userID uint, input *api.
 	updates := make(map[string]interface{})
 
 	if input.CategoryId != nil {
-		var category models.Category
-		if err := s.db.Where("id = ? AND user_id = ?", *input.CategoryId, userID).First(&category).Error; err != nil {
-			return nil, err
-		}
 		updates["category_id"] = *input.CategoryId
 	}
 	if input.Type != nil {

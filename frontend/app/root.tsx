@@ -1,4 +1,4 @@
-import { Link, Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
+import { Link, Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteLoaderData } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 import { Toaster } from "sonner";
@@ -7,8 +7,9 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import Container from "~/shared/components/ui/Container";
 import { HeaderNavigation } from "~/shared/components/layout/HeaderNavigation";
+import { BottomNavigation } from "~/shared/components/layout/BottomNavigation";
 import { authMiddleware } from "~/features/auth/auth-middleware";
-import { authContext } from "~/features/auth/auth-context";
+import { authContext, type AuthState } from "~/features/auth/auth-context";
 import { NAVIGATION_PAGE_LIST } from "./routes";
 
 export const links: Route.LinksFunction = () => [
@@ -27,11 +28,19 @@ export const links: Route.LinksFunction = () => [
 export const clientMiddleware = [authMiddleware];
 
 export async function clientLoader({ context }: Route.ClientLoaderArgs) {
+  // middlewareでセット済みの認証状態を取得して返す
   const auth = context.get(authContext);
-  return { isSignedIn: !!auth?.isSignedIn, csrfToken: auth?.csrfToken ?? "" };
+  return { isSignedIn: auth?.isSignedIn ?? false, csrfToken: auth?.csrfToken ?? "" };
 }
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5分間はキャッシュを使用
+      gcTime: 10 * 60 * 1000, // 10分間キャッシュを保持
+    },
+  },
+});
 
 function Fallback({ error }: { error: Error }) {
   return (
@@ -72,13 +81,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
-        <div>
-          <HeaderNavigation>
-            <Container containerWidth='w-4/5'>{children}</Container>
-          </HeaderNavigation>
-        </div>
-        <Toaster position='top-center' richColors />
+      <body className='bg-[#f8f9fa] min-h-screen'>
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        <Toaster position='top-center' richColors closeButton />
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -86,12 +91,26 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+function AppContent() {
+  const data = useRouteLoaderData("root") as AuthState | undefined;
+  const isSignedIn = data?.isSignedIn ?? false;
+
+  return (
+    <HeaderNavigation>
+      <Container containerWidth='w-4/5'>
+        <div className={isSignedIn ? "pb-20" : ""}>
+          <Outlet />
+        </div>
+      </Container>
+    </HeaderNavigation>
+  );
+}
+
 export default function App() {
   return (
     <ReactErrorBoundary fallbackRender={Fallback}>
-      <QueryClientProvider client={queryClient}>
-        <Outlet />
-      </QueryClientProvider>
+      <AppContent />
+      <BottomNavigation />
     </ReactErrorBoundary>
   );
 }

@@ -12,6 +12,10 @@ const ROUTE_DEFINITIONS: RouteDefinition[] = [
   { path: "/sign-up", file: "pages/sign-up.tsx", requiresAuth: false },
   { path: "/sign-in", file: "pages/sign-in.tsx", requiresAuth: false, redirectIfAuthenticated: true },
   { path: "/calendar", file: "pages/calendar.tsx", requiresAuth: true },
+  { path: "/transactions", file: "pages/transactions.tsx", requiresAuth: true },
+  { path: "/settings", file: "pages/settings/index.tsx", requiresAuth: true },
+  { path: "/settings/categories", file: "pages/settings/categories.tsx", requiresAuth: true },
+  { path: "/settings/budget", file: "pages/settings/budget.tsx", requiresAuth: true },
 ];
 
 export const NAVIGATION_PAGE_LIST = {
@@ -19,6 +23,10 @@ export const NAVIGATION_PAGE_LIST = {
   signUpPage: "/sign-up",
   signInPage: "/sign-in",
   calendarPage: "/calendar",
+  transactionsPage: "/transactions",
+  settingsPage: "/settings",
+  categoriesPage: "/settings/categories",
+  budgetPage: "/settings/budget",
 };
 
 export function getRouteDefinition(pathname: string): RouteDefinition | undefined {

@@ -3,18 +3,13 @@ import { authContext } from "./auth-context";
 import { getRouteDefinition, NAVIGATION_PAGE_LIST } from "~/app/routes";
 import { getCheckSignedIn } from "./services/users-api";
 import { getCsrfToken } from "./services/csrf-api";
-import { getAuthCache, setAuthCache } from "./services/cache";
+import { setCsrfToken as storeCsrfToken } from "~/shared/lib/csrf-store";
 
 async function getAuthState(): Promise<{ csrfToken: string; isSignedIn: boolean }> {
-  const cached = getAuthCache();
-  if (cached) {
-    return { csrfToken: cached.csrfToken, isSignedIn: cached.isSignedIn };
-  }
-
   const csrfToken = await getCsrfToken();
+  // CSRFトークンをグローバルストレージに保存（customFetchで使用）
+  storeCsrfToken(csrfToken);
   const isSignedIn = await getCheckSignedIn(csrfToken);
-  setAuthCache(csrfToken, isSignedIn);
-
   return { csrfToken, isSignedIn };
 }
 
@@ -34,12 +29,17 @@ export const authMiddleware: MiddlewareFunction = async ({ request, context }) =
     }
     // 認証が必要なページに未ログインでアクセス
     if (routeDef.requiresAuth && !isSignedIn) {
-      redirectTo = NAVIGATION_PAGE_LIST.signInPage;
+      // ログイン後に元のページに戻れるようにクエリパラメータで保存
+      const redirectUrl = new URL(NAVIGATION_PAGE_LIST.signInPage, url.origin);
+      redirectUrl.searchParams.set("redirect", pathname);
+      redirectTo = redirectUrl.pathname + redirectUrl.search;
     }
   } else {
     // 未定義のルートは認証必須として扱う（安全側に倒す）
     if (!isSignedIn) {
-      redirectTo = NAVIGATION_PAGE_LIST.signInPage;
+      const redirectUrl = new URL(NAVIGATION_PAGE_LIST.signInPage, url.origin);
+      redirectUrl.searchParams.set("redirect", pathname);
+      redirectTo = redirectUrl.pathname + redirectUrl.search;
     }
   }
 

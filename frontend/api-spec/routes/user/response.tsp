@@ -14,3 +14,9 @@ model UserCheckSignedInResponse {
   @doc("ログイン状態")
   is_signed_in: boolean;
 }
+
+@doc("User Sign Out Response")
+model UserSignOutResponse {
+  @doc("メッセージ")
+  message: string;
+}

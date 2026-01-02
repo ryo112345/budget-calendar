@@ -21,8 +21,8 @@ namespace BudgetCalendarService.Transaction {
     @doc("ユーザーに紐づく取引一覧を取得。クエリパラメータでフィルタリング可能")
     @get
     get(
-      @query @doc("開始日（YYYY-MM-DD形式）") start_date?: plainDate,
-      @query @doc("終了日（YYYY-MM-DD形式）") end_date?: plainDate,
+      @query @doc("開始日（YYYY-MM-DD形式）") start_date?: string,
+      @query @doc("終了日（YYYY-MM-DD形式）") end_date?: string,
       @query @doc("取引タイプ（income/expense）") type?: TransactionType,
       @query @doc("カテゴリID") category_id?: int32
     ): SuccessResponse<FetchTransactionListResponse>

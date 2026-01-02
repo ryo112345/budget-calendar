@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS categories(
 	color VARCHAR(20),
 	created_at DATETIME NOT NULL,
 	updated_at DATETIME NOT NULL,
-	deleted_at DATETIME,
 	INDEX idx_user_id (user_id),
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

@@ -10,7 +10,8 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     tty: true
     environment:
       - TZ=Asia/Tokyo
@@ -29,7 +30,8 @@ services:
     volumes:
       - ./migrations:/app
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     tty: true
     environment:
       - TZ=Asia/Tokyo
@@ -50,6 +52,12 @@ services:
       TZ: 'Asia/Tokyo'
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
 volumes:
   mysql_data:

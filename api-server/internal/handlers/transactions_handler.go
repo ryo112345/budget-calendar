@@ -97,8 +97,8 @@ func (h *transactionsHandler) PostTransactions(ctx context.Context, request api.
 			}, nil
 		}
 
-		// カテゴリが見つからない場合
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		// カテゴリが見つからない場合（外部キー制約違反）
+		if helpers.IsForeignKeyViolation(err) {
 			return api.PostTransactions400JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    400,
@@ -206,7 +206,7 @@ func (h *transactionsHandler) PatchTransactionsId(ctx context.Context, request a
 			}, nil
 		}
 
-		// 取引またはカテゴリが見つからない場合
+		// 取引が見つからない場合
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return api.PatchTransactionsId404JSONResponse{
 				Error: api.ErrorResponse{
@@ -217,6 +217,24 @@ func (h *transactionsHandler) PatchTransactionsId(ctx context.Context, request a
 						{
 							Type:   api.ErrorInfoTypeErrorInfo,
 							Reason: api.TRANSACTIONNOTFOUND,
+							Domain: "budget-calendar.example.com",
+						},
+					},
+				},
+			}, nil
+		}
+
+		// カテゴリが見つからない場合（外部キー制約違反）
+		if helpers.IsForeignKeyViolation(err) {
+			return api.PatchTransactionsId400JSONResponse{
+				Error: api.ErrorResponse{
+					Code:    400,
+					Message: "指定されたカテゴリが見つかりません",
+					Status:  api.INVALIDARGUMENT,
+					Details: &[]api.ErrorInfo{
+						{
+							Type:   api.ErrorInfoTypeErrorInfo,
+							Reason: api.CATEGORYNOTFOUND,
 							Domain: "budget-calendar.example.com",
 						},
 					},

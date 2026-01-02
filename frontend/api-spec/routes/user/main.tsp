@@ -55,4 +55,17 @@ namespace BudgetCalendarService.User {
     @get
     get(): SuccessResponse<UserCheckSignedInResponse>;
   }
+
+  @route("/signOut")
+  interface SignOut {
+    @operationId("post-users-sign-out")
+    @summary("User SignOut")
+    @doc("ユーザーログアウト")
+    @post
+    post(): {
+      @statusCode status: 200;
+      @header setCookie?: string;
+      @body body: UserSignOutResponse;
+    } | ErrorInternalServerErrorResponse;
+  }
 }

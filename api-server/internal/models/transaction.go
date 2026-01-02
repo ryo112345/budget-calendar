@@ -1,10 +1,6 @@
 package models
 
-import (
-	"time"
-
-	"gorm.io/gorm"
-)
+import "time"
 
 type TransactionType string
 
@@ -25,5 +21,4 @@ type Transaction struct {
 	Description string          `gorm:"size:255" json:"description"`
 	CreatedAt   time.Time       `json:"created_at"`
 	UpdatedAt   time.Time       `json:"updated_at"`
-	DeletedAt   gorm.DeletedAt  `gorm:"index" json:"-"`
 }

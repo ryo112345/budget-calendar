@@ -256,7 +256,7 @@ func (h *categoriesHandler) DeleteCategoriesId(ctx context.Context, request api.
 				Error: api.ErrorResponse{
 					Code:    400,
 					Message: "このカテゴリは使用中のため削除できません",
-					Status:  api.INVALIDARGUMENT,
+					Status:  api.FAILEDPRECONDITION,
 					Details: &[]api.ErrorInfo{
 						{
 							Type:   api.ErrorInfoTypeErrorInfo,

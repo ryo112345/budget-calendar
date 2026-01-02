@@ -96,26 +96,8 @@ func (h *budgetsHandler) PostBudgets(ctx context.Context, request api.PostBudget
 			}, nil
 		}
 
-		// カテゴリが見つからない場合
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return api.PostBudgets400JSONResponse{
-				Error: api.ErrorResponse{
-					Code:    400,
-					Message: "指定されたカテゴリが見つかりません",
-					Status:  api.INVALIDARGUMENT,
-					Details: &[]api.ErrorInfo{
-						{
-							Type:   api.ErrorInfoTypeErrorInfo,
-							Reason: api.CATEGORYNOTFOUND,
-							Domain: "budget-calendar.example.com",
-						},
-					},
-				},
-			}, nil
-		}
-
-		// 予算が既に存在する場合
-		if errors.Is(err, services.ErrBudgetAlreadyExists) {
+		// 予算が既に存在する場合（ユニーク制約違反）
+		if helpers.IsDuplicateEntry(err) {
 			return api.PostBudgets409JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    409,
@@ -125,6 +107,24 @@ func (h *budgetsHandler) PostBudgets(ctx context.Context, request api.PostBudget
 						{
 							Type:   api.ErrorInfoTypeErrorInfo,
 							Reason: api.BUDGETALREADYEXISTS,
+							Domain: "budget-calendar.example.com",
+						},
+					},
+				},
+			}, nil
+		}
+
+		// カテゴリが見つからない場合（外部キー制約違反）
+		if helpers.IsForeignKeyViolation(err) {
+			return api.PostBudgets400JSONResponse{
+				Error: api.ErrorResponse{
+					Code:    400,
+					Message: "指定されたカテゴリが見つかりません",
+					Status:  api.INVALIDARGUMENT,
+					Details: &[]api.ErrorInfo{
+						{
+							Type:   api.ErrorInfoTypeErrorInfo,
+							Reason: api.CATEGORYNOTFOUND,
 							Domain: "budget-calendar.example.com",
 						},
 					},
@@ -223,7 +223,7 @@ func (h *budgetsHandler) PatchBudgetsId(ctx context.Context, request api.PatchBu
 			}, nil
 		}
 
-		// 予算またはカテゴリが見つからない場合
+		// 予算が見つからない場合
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return api.PatchBudgetsId404JSONResponse{
 				Error: api.ErrorResponse{
@@ -241,8 +241,8 @@ func (h *budgetsHandler) PatchBudgetsId(ctx context.Context, request api.PatchBu
 			}, nil
 		}
 
-		// 予算が既に存在する場合（重複）
-		if errors.Is(err, services.ErrBudgetAlreadyExists) {
+		// 予算が既に存在する場合（ユニーク制約違反）
+		if helpers.IsDuplicateEntry(err) {
 			return api.PatchBudgetsId409JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    409,
@@ -252,6 +252,24 @@ func (h *budgetsHandler) PatchBudgetsId(ctx context.Context, request api.PatchBu
 						{
 							Type:   api.ErrorInfoTypeErrorInfo,
 							Reason: api.BUDGETALREADYEXISTS,
+							Domain: "budget-calendar.example.com",
+						},
+					},
+				},
+			}, nil
+		}
+
+		// カテゴリが見つからない場合（外部キー制約違反）
+		if helpers.IsForeignKeyViolation(err) {
+			return api.PatchBudgetsId400JSONResponse{
+				Error: api.ErrorResponse{
+					Code:    400,
+					Message: "指定されたカテゴリが見つかりません",
+					Status:  api.INVALIDARGUMENT,
+					Details: &[]api.ErrorInfo{
+						{
+							Type:   api.ErrorInfoTypeErrorInfo,
+							Reason: api.CATEGORYNOTFOUND,
 							Domain: "budget-calendar.example.com",
 						},
 					},

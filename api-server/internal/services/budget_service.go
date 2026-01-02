@@ -1,16 +1,12 @@
 package services
 
 import (
-	"errors"
-
 	api "apps/apis"
 	"apps/internal/models"
 	"apps/internal/validators"
 
 	"gorm.io/gorm"
 )
-
-var ErrBudgetAlreadyExists = errors.New("budget already exists for this category and month")
 
 type BudgetService interface {
 	FetchBudgets(userID uint, params *api.GetBudgetsParams) ([]models.Budget, error)
@@ -60,22 +56,6 @@ func (s *budgetService) CreateBudget(userID uint, input *api.CreateBudgetInput) 
 		return nil, err
 	}
 
-	// カテゴリの存在確認
-	var category models.Category
-	if err := s.db.Where("id = ? AND user_id = ?", input.CategoryId, userID).First(&category).Error; err != nil {
-		return nil, err
-	}
-
-	// 同じ月・カテゴリの予算が既に存在するかチェック
-	var existingBudget models.Budget
-	err := s.db.Where("user_id = ? AND category_id = ? AND month = ?", userID, input.CategoryId, input.Month).First(&existingBudget).Error
-	if err == nil {
-		return nil, ErrBudgetAlreadyExists
-	}
-	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, err
-	}
-
 	budget := models.Budget{
 		UserID:     userID,
 		CategoryID: uint(input.CategoryId),
@@ -109,11 +89,6 @@ func (s *budgetService) UpdateBudget(id uint, userID uint, input *api.UpdateBudg
 	updates := make(map[string]interface{})
 
 	if input.CategoryId != nil {
-		// カテゴリの存在確認
-		var category models.Category
-		if err := s.db.Where("id = ? AND user_id = ?", *input.CategoryId, userID).First(&category).Error; err != nil {
-			return nil, err
-		}
 		updates["category_id"] = *input.CategoryId
 	}
 	if input.Amount != nil {
@@ -121,27 +96,6 @@ func (s *budgetService) UpdateBudget(id uint, userID uint, input *api.UpdateBudg
 	}
 	if input.Month != nil {
 		updates["month"] = *input.Month
-	}
-
-	// 月またはカテゴリが変更される場合、重複チェック
-	newCategoryID := existing.CategoryID
-	newMonth := existing.Month
-	if input.CategoryId != nil {
-		newCategoryID = uint(*input.CategoryId)
-	}
-	if input.Month != nil {
-		newMonth = *input.Month
-	}
-
-	if newCategoryID != existing.CategoryID || newMonth != existing.Month {
-		var conflictBudget models.Budget
-		err := s.db.Where("user_id = ? AND category_id = ? AND month = ? AND id != ?", userID, newCategoryID, newMonth, id).First(&conflictBudget).Error
-		if err == nil {
-			return nil, ErrBudgetAlreadyExists
-		}
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, err
-		}
 	}
 
 	if err := s.db.Model(&models.Budget{}).Where("id = ? AND user_id = ?", id, userID).Updates(updates).Error; err != nil {

@@ -436,7 +436,6 @@ paths:
           description: 開始日（YYYY-MM-DD形式）
           schema:
             type: string
-            format: date
           explode: false
         - name: end_date
           in: query
@@ -444,7 +443,6 @@ paths:
           description: 終了日（YYYY-MM-DD形式）
           schema:
             type: string
-            format: date
           explode: false
         - name: type
           in: query
@@ -699,6 +697,32 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/User.SignInInput'
+  /users/signOut:
+    post:
+      operationId: post-users-sign-out
+      summary: User SignOut
+      description: ユーザーログアウト
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            set-cookie:
+              required: false
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User.UserSignOutResponse'
+        '500':
+          description: '500 Internal Server Error - サーバーエラー (例: DATABASE_ERROR, UNKNOWN_ERROR)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - users
   /users/signUp:
     post:
       operationId: post-users-sign-up
@@ -1005,6 +1029,7 @@ components:
       type: string
       enum:
         - INVALID_ARGUMENT
+        - FAILED_PRECONDITION
         - ALREADY_EXISTS
         - NOT_FOUND
         - PERMISSION_DENIED
@@ -1247,6 +1272,15 @@ components:
     User.UserSignInResponse:
       type: object
       description: User Sign In Response
+    User.UserSignOutResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: メッセージ
+      description: User Sign Out Response
     User.UserSignUpResponse:
       type: object
       required:

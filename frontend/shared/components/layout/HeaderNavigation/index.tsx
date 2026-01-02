@@ -1,4 +1,5 @@
-import { Link } from "react-router";
+import { NavLink, Link } from "react-router";
+import { Calendar, Receipt, Settings } from "lucide-react";
 import { NAVIGATION_PAGE_LIST } from "~/app/routes";
 import { useAuth } from "~/features/auth/hooks/useAuth";
 
@@ -6,31 +7,62 @@ type Props = {
   children: React.ReactNode;
 };
 
+const navItems = [
+  {
+    to: NAVIGATION_PAGE_LIST.calendarPage,
+    label: "カレンダー",
+    icon: Calendar,
+  },
+  {
+    to: NAVIGATION_PAGE_LIST.transactionsPage,
+    label: "取引",
+    icon: Receipt,
+  },
+  {
+    to: NAVIGATION_PAGE_LIST.settingsPage,
+    label: "設定",
+    icon: Settings,
+  },
+];
+
 export function HeaderNavigation({ children }: Props) {
   const { isSignedIn } = useAuth();
 
   return (
     <>
       <header className='bg-white py-4 px-6 border-b fixed top-0 left-0 w-full z-100'>
-        <div className='mx-auto flex flex-col md:flex-row md:items-center md:justify-between'>
-          <h1 className='text-center text-lg md:text-2xl font-semibold text-gray-800'>
+        <div className='mx-auto flex items-center justify-between'>
+          <h1 className='text-lg md:text-2xl font-semibold text-gray-800'>
             <Link to={NAVIGATION_PAGE_LIST.top}>Budget Calendar</Link>
           </h1>
 
-          <nav className='mt-2 md:mt-0 flex justify-center md:justify-end items-center space-x-4 text-sm md:text-base'>
-            {isSignedIn ? (
-              <Link to={NAVIGATION_PAGE_LIST.calendarPage} className='underline text-gray-600 hover:text-gray-900 transition'>
-                カレンダー
-              </Link>
-            ) : (
-              <Link to={NAVIGATION_PAGE_LIST.signInPage} className='underline text-gray-600 hover:text-gray-900 transition'>
+          {isSignedIn ? (
+            // PC用ナビゲーション（md以上で表示）
+            <nav className='hidden md:flex items-center space-x-6'>
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `flex items-center space-x-1 px-5 py-1.5 rounded-full transition ${isActive ? "text-blue-600 font-medium" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`
+                  }
+                >
+                  <item.icon className='w-4 h-4' />
+                  <span>{item.label}</span>
+                </NavLink>
+              ))}
+            </nav>
+          ) : (
+            // 未ログイン時のナビゲーション
+            <nav className='flex items-center space-x-4 text-sm md:text-base'>
+              <Link to={NAVIGATION_PAGE_LIST.signInPage} className='text-gray-600 hover:text-gray-900 transition'>
                 ログイン
               </Link>
-            )}
-            <Link to={NAVIGATION_PAGE_LIST.signUpPage} className='underline text-gray-600 hover:text-gray-900 transition'>
-              会員登録
-            </Link>
-          </nav>
+              <Link to={NAVIGATION_PAGE_LIST.signUpPage} className='text-gray-600 hover:text-gray-900 transition'>
+                会員登録
+              </Link>
+            </nav>
+          )}
         </div>
       </header>
       <div className='mx-auto pt-20 px-6'>{children}</div>

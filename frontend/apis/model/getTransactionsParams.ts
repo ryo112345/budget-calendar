@@ -11,11 +11,11 @@ export type GetTransactionsParams = {
   /**
    * 開始日（YYYY-MM-DD形式）
    */
-  start_date?: Date;
+  start_date?: string;
   /**
    * 終了日（YYYY-MM-DD形式）
    */
-  end_date?: Date;
+  end_date?: string;
   /**
    * 取引タイプ（income/expense）
    */

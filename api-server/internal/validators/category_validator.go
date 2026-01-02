@@ -24,11 +24,11 @@ func ValidateCreateCategory(input *api.CreateCategoryInput) error {
 func ValidateUpdateCategory(input *api.UpdateCategoryInput) error {
 	return validation.ValidateStruct(input,
 		validation.Field(
-			input.Name,
+			&input.Name,
 			validation.Length(1, 100).Error("カテゴリ名は1〜100文字で入力してください"),
 		),
 		validation.Field(
-			input.Color,
+			&input.Color,
 			validation.Length(1, 20).Error("色は1〜20文字で入力してください"),
 		),
 	)

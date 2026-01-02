@@ -7,6 +7,9 @@ enum ErrorStatus {
   @doc("無効な引数")
   INVALID_ARGUMENT: "INVALID_ARGUMENT",
 
+  @doc("前提条件が満たされていない")
+  FAILED_PRECONDITION: "FAILED_PRECONDITION",
+
   @doc("リソースが既に存在")
   ALREADY_EXISTS: "ALREADY_EXISTS",
 
