@@ -32,7 +32,7 @@ export function DayDetail({ date, transactions, onClose, onAddTransaction, onEdi
 
         {/* Summary */}
         <div className='p-4 border-b bg-gray-50'>
-          <div className='flex justify-between text-sm'>
+          <div className='flex justify-center gap-24 text-lg'>
             <div>
               <span className='text-gray-600'>収入: </span>
               <span className='text-green-600 font-medium'>+{formatAmount(income)}</span>
