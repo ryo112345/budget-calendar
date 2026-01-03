@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns";
 import { X } from "lucide-react";
 import type { Transaction, CategoryType, CreateTransactionInput, UpdateTransactionInput } from "~/apis/model";
@@ -18,7 +18,7 @@ type Props = {
 export function TransactionForm({ transaction, defaultDate, onSubmit, onDelete, onClose, isSubmitting, isDeleting }: Props) {
   const isEditing = !!transaction;
   const { data: categoriesData, isLoading: isCategoriesLoading } = useGetCategories();
-  const allCategories = categoriesData?.categories ?? [];
+  const allCategories = useMemo(() => categoriesData?.categories ?? [], [categoriesData?.categories]);
 
   const getInitialDate = () => {
     if (transaction?.date) {
@@ -56,7 +56,6 @@ export function TransactionForm({ transaction, defaultDate, onSubmit, onDelete, 
     }
   };
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -76,12 +75,12 @@ export function TransactionForm({ transaction, defaultDate, onSubmit, onDelete, 
       const data = {
         amount: amountValue,
         category_id: categoryId,
-        date,
+        date: new Date(date),
         description: description || undefined,
       };
       await onSubmit(data);
       onClose();
-    } catch (err) {
+    } catch {
       setError("保存に失敗しました");
     }
   };
@@ -93,7 +92,7 @@ export function TransactionForm({ transaction, defaultDate, onSubmit, onDelete, 
     try {
       await onDelete();
       onClose();
-    } catch (err) {
+    } catch {
       setError("削除に失敗しました");
     }
   };
@@ -161,7 +160,9 @@ export function TransactionForm({ transaction, defaultDate, onSubmit, onDelete, 
                 required
                 className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${categoryId === "" ? "text-gray-400" : ""}`}
               >
-                <option value="" disabled className="text-gray-400">選択してください</option>
+                <option value='' disabled className='text-gray-400'>
+                  選択してください
+                </option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}
@@ -214,7 +215,7 @@ export function TransactionForm({ transaction, defaultDate, onSubmit, onDelete, 
             </button>
             <button
               type='submit'
-              disabled={isSubmitting || categories.length === 0}
+              disabled={isSubmitting || categories.length === 0 || !amount || !categoryId || !date}
               className='px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50'
             >
               {isSubmitting ? "保存中..." : "保存"}

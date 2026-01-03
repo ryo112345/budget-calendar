@@ -10,7 +10,6 @@ import (
 	"apps/internal/services"
 
 	"github.com/oapi-codegen/runtime/types"
-	"gorm.io/gorm"
 )
 
 type TransactionsHandler interface {
@@ -97,8 +96,8 @@ func (h *transactionsHandler) PostTransactions(ctx context.Context, request api.
 			}, nil
 		}
 
-		// カテゴリが見つからない場合（外部キー制約違反）
-		if helpers.IsForeignKeyViolation(err) {
+		// カテゴリが見つからない場合
+		if errors.Is(err, services.ErrCategoryNotFound) {
 			return api.PostTransactions400JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    400,
@@ -142,7 +141,7 @@ func (h *transactionsHandler) GetTransactionsId(ctx context.Context, request api
 
 	transaction, err := h.service.FetchTransactionByID(uint(request.Id), userID)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, services.ErrTransactionNotFound) {
 			return api.GetTransactionsId404JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    404,
@@ -207,7 +206,7 @@ func (h *transactionsHandler) PatchTransactionsId(ctx context.Context, request a
 		}
 
 		// 取引が見つからない場合
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, services.ErrTransactionNotFound) {
 			return api.PatchTransactionsId404JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    404,
@@ -224,8 +223,8 @@ func (h *transactionsHandler) PatchTransactionsId(ctx context.Context, request a
 			}, nil
 		}
 
-		// カテゴリが見つからない場合（外部キー制約違反）
-		if helpers.IsForeignKeyViolation(err) {
+		// カテゴリが見つからない場合
+		if errors.Is(err, services.ErrCategoryNotFound) {
 			return api.PatchTransactionsId400JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    400,
@@ -270,7 +269,7 @@ func (h *transactionsHandler) DeleteTransactionsId(ctx context.Context, request 
 
 	if err := h.service.DeleteTransaction(uint(request.Id), userID); err != nil {
 		// 取引が見つからない場合
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, services.ErrTransactionNotFound) {
 			return api.DeleteTransactionsId404JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    404,

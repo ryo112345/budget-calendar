@@ -8,8 +8,6 @@ import (
 	"apps/internal/helpers"
 	"apps/internal/models"
 	"apps/internal/services"
-
-	"gorm.io/gorm"
 )
 
 type CategoriesHandler interface {
@@ -123,7 +121,7 @@ func (h *categoriesHandler) GetCategoriesId(ctx context.Context, request api.Get
 
 	category, err := h.service.FetchCategoryByID(uint(request.Id), userID)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, services.ErrCategoryNotFound) {
 			return api.GetCategoriesId404JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    404,
@@ -188,7 +186,7 @@ func (h *categoriesHandler) PatchCategoriesId(ctx context.Context, request api.P
 		}
 
 		// カテゴリが見つからない場合
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, services.ErrCategoryNotFound) {
 			return api.PatchCategoriesId404JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    404,
@@ -233,7 +231,7 @@ func (h *categoriesHandler) DeleteCategoriesId(ctx context.Context, request api.
 
 	if err := h.service.DeleteCategory(uint(request.Id), userID); err != nil {
 		// カテゴリが見つからない場合
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, services.ErrCategoryNotFound) {
 			return api.DeleteCategoriesId404JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    404,
@@ -250,8 +248,8 @@ func (h *categoriesHandler) DeleteCategoriesId(ctx context.Context, request api.
 			}, nil
 		}
 
-		// カテゴリが使用中の場合（外部キー制約違反）
-		if helpers.IsForeignKeyViolation(err) {
+		// カテゴリが使用中の場合
+		if errors.Is(err, services.ErrCategoryInUse) {
 			return api.DeleteCategoriesId400JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    400,

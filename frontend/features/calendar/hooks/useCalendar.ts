@@ -3,7 +3,6 @@ import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, ad
 import { useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { useGetTransactions, getGetTransactionsQueryKey, getTransactions } from "~/apis/transactions/transactions";
 import { useGetBudgets, getGetBudgetsQueryKey, getBudgets } from "~/apis/budgets/budgets";
-import type { Transaction } from "~/apis/model";
 
 export type DailyAmount = {
   income: number;

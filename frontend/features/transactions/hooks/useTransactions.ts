@@ -9,7 +9,7 @@ import {
   getGetTransactionsQueryKey,
   getTransactions,
 } from "~/apis/transactions/transactions";
-import type { CreateTransactionInput, UpdateTransactionInput, Transaction } from "~/apis/model";
+import type { CreateTransactionInput, UpdateTransactionInput } from "~/apis/model";
 
 export function useTransactions() {
   const [currentDate, setCurrentDate] = useState(new Date());

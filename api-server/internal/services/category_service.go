@@ -2,6 +2,7 @@ package services
 
 import (
 	api "apps/apis"
+	"apps/internal/helpers"
 	"apps/internal/models"
 	"apps/internal/validators"
 
@@ -34,6 +35,9 @@ func (s *categoryService) FetchCategoryByID(id uint, userID uint) (*models.Categ
 	var category models.Category
 	err := s.db.Where("id = ? AND user_id = ?", id, userID).First(&category).Error
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, ErrCategoryNotFound
+		}
 		return nil, err
 	}
 	return &category, nil
@@ -63,6 +67,15 @@ func (s *categoryService) UpdateCategory(id uint, userID uint, input *api.Update
 		return nil, err
 	}
 
+	// カテゴリの存在確認
+	var existing models.Category
+	if err := s.db.Where("id = ? AND user_id = ?", id, userID).First(&existing).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, ErrCategoryNotFound
+		}
+		return nil, err
+	}
+
 	updates := make(map[string]interface{})
 	if input.Name != nil {
 		updates["name"] = *input.Name
@@ -86,10 +99,13 @@ func (s *categoryService) UpdateCategory(id uint, userID uint, input *api.Update
 func (s *categoryService) DeleteCategory(id uint, userID uint) error {
 	result := s.db.Where("id = ? AND user_id = ?", id, userID).Delete(&models.Category{})
 	if result.Error != nil {
+		if helpers.IsForeignKeyViolation(result.Error) {
+			return ErrCategoryInUse
+		}
 		return result.Error
 	}
 	if result.RowsAffected == 0 {
-		return gorm.ErrRecordNotFound
+		return ErrCategoryNotFound
 	}
 	return nil
 }

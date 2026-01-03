@@ -89,9 +89,7 @@ export function BudgetForm({ budget, isOpen, isSaving, existingCategoryIds, onCl
                 新しいカテゴリを追加するか、既存の予算を編集してください。
               </div>
             ) : budget ? (
-              <div className='w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-700'>
-                {budget.category.name}
-              </div>
+              <div className='w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-700'>{budget.category.name}</div>
             ) : (
               <select
                 value={categoryId}

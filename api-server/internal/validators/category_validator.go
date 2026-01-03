@@ -28,13 +28,21 @@ func ValidateCreateCategory(input *api.CreateCategoryInput) error {
 
 func ValidateUpdateCategory(input *api.UpdateCategoryInput) error {
 	return validation.ValidateStruct(input,
-		validation.Field(
-			&input.Name,
+		validation.Field(&input.Name,
+			validation.By(atLeastOneCategoryField(input)),
 			validation.Length(1, 100).Error("カテゴリ名は1〜100文字で入力してください"),
 		),
-		validation.Field(
-			&input.Color,
+		validation.Field(&input.Color,
 			validation.Length(1, 20).Error("色は1〜20文字で入力してください"),
 		),
 	)
+}
+
+func atLeastOneCategoryField(input *api.UpdateCategoryInput) validation.RuleFunc {
+	return func(value interface{}) error {
+		if input.Name == nil && input.Color == nil {
+			return validation.NewError("no_fields", "更新するフィールドを1つ以上指定してください")
+		}
+		return nil
+	}
 }

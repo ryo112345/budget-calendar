@@ -38,30 +38,28 @@ func ValidateCreateTransaction(input *api.CreateTransactionInput) error {
 }
 
 func ValidateUpdateTransaction(input *api.UpdateTransactionInput) error {
-	if input.CategoryId == nil &&
-		input.Amount == nil &&
-		input.Date == nil &&
-		input.Description == nil {
-		return validation.NewError("no_fields", "更新するフィールドを1つ以上指定してください")
-	}
+	return validation.ValidateStruct(input,
+		validation.Field(&input.CategoryId,
+			validation.By(atLeastOneTransactionField(input)),
+			validation.Min(1).Error("カテゴリIDは1以上で入力してください"),
+		),
+		validation.Field(&input.Amount,
+			validation.Min(1).Error("金額は1以上で入力してください"),
+		),
+		validation.Field(&input.Description,
+			validation.Length(0, 255).Error("説明は255文字以内で入力してください"),
+		),
+	)
+}
 
-	if input.CategoryId != nil {
-		if err := validation.Validate(*input.CategoryId, validation.Min(1).Error("カテゴリIDは1以上で入力してください")); err != nil {
-			return err
+func atLeastOneTransactionField(input *api.UpdateTransactionInput) validation.RuleFunc {
+	return func(value interface{}) error {
+		if input.CategoryId == nil &&
+			input.Amount == nil &&
+			input.Date == nil &&
+			input.Description == nil {
+			return validation.NewError("no_fields", "更新するフィールドを1つ以上指定してください")
 		}
+		return nil
 	}
-
-	if input.Amount != nil {
-		if err := validation.Validate(*input.Amount, validation.Min(1).Error("金額は1以上で入力してください")); err != nil {
-			return err
-		}
-	}
-
-	if input.Description != nil {
-		if err := validation.Validate(*input.Description, validation.Length(0, 255).Error("説明は255文字以内で入力してください")); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }

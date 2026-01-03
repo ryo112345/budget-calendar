@@ -97,9 +97,7 @@ export function CategoryForm({ category, isOpen, isSaving, onClose, onSubmit }: 
               収入
             </button>
           </div>
-          {isEditing && (
-            <p className='text-xs text-gray-500'>※カテゴリタイプは変更できません</p>
-          )}
+          {isEditing && <p className='text-xs text-gray-500'>※カテゴリタイプは変更できません</p>}
           <div>
             <label className='block text-sm font-medium text-gray-700 mb-1'>カテゴリ名</label>
             <input

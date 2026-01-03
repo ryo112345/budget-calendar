@@ -2,6 +2,7 @@ package services
 
 import (
 	api "apps/apis"
+	"apps/internal/helpers"
 	"apps/internal/models"
 	"apps/internal/validators"
 
@@ -53,6 +54,9 @@ func (s *transactionService) FetchTransactionByID(id uint, userID uint) (*models
 	var transaction models.Transaction
 	err := s.db.Preload("Category").Where("id = ? AND user_id = ?", id, userID).First(&transaction).Error
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, ErrTransactionNotFound
+		}
 		return nil, err
 	}
 	return &transaction, nil
@@ -77,6 +81,9 @@ func (s *transactionService) CreateTransaction(userID uint, input *api.CreateTra
 	}
 
 	if err := s.db.Create(&transaction).Error; err != nil {
+		if helpers.IsForeignKeyViolation(err) {
+			return nil, ErrCategoryNotFound
+		}
 		return nil, err
 	}
 
@@ -94,6 +101,9 @@ func (s *transactionService) UpdateTransaction(id uint, userID uint, input *api.
 
 	var existing models.Transaction
 	if err := s.db.Where("id = ? AND user_id = ?", id, userID).First(&existing).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, ErrTransactionNotFound
+		}
 		return nil, err
 	}
 
@@ -113,6 +123,9 @@ func (s *transactionService) UpdateTransaction(id uint, userID uint, input *api.
 	}
 
 	if err := s.db.Model(&models.Transaction{}).Where("id = ? AND user_id = ?", id, userID).Updates(updates).Error; err != nil {
+		if helpers.IsForeignKeyViolation(err) {
+			return nil, ErrCategoryNotFound
+		}
 		return nil, err
 	}
 
@@ -130,7 +143,7 @@ func (s *transactionService) DeleteTransaction(id uint, userID uint) error {
 		return result.Error
 	}
 	if result.RowsAffected == 0 {
-		return gorm.ErrRecordNotFound
+		return ErrTransactionNotFound
 	}
 	return nil
 }

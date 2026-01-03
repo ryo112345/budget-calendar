@@ -15,11 +15,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	ErrEmailAlreadyExists   = errors.New("email already exists")
-	ErrAuthenticationFailed = errors.New("authentication failed")
-)
-
 type UserService interface {
 	SignUp(input *api.UserSignUpInput) (string, error)
 	SignIn(input *api.UserSignInInput) (string, error)

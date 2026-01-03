@@ -8,8 +8,6 @@ import (
 	"apps/internal/helpers"
 	"apps/internal/models"
 	"apps/internal/services"
-
-	"gorm.io/gorm"
 )
 
 type BudgetsHandler interface {
@@ -96,8 +94,8 @@ func (h *budgetsHandler) PostBudgets(ctx context.Context, request api.PostBudget
 			}, nil
 		}
 
-		// 予算が既に存在する場合（ユニーク制約違反）
-		if helpers.IsDuplicateEntry(err) {
+		// 予算が既に存在する場合
+		if errors.Is(err, services.ErrBudgetAlreadyExists) {
 			return api.PostBudgets409JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    409,
@@ -114,8 +112,8 @@ func (h *budgetsHandler) PostBudgets(ctx context.Context, request api.PostBudget
 			}, nil
 		}
 
-		// カテゴリが見つからない場合（外部キー制約違反）
-		if helpers.IsForeignKeyViolation(err) {
+		// カテゴリが見つからない場合
+		if errors.Is(err, services.ErrCategoryNotFound) {
 			return api.PostBudgets400JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    400,
@@ -159,7 +157,7 @@ func (h *budgetsHandler) GetBudgetsId(ctx context.Context, request api.GetBudget
 
 	budget, err := h.service.FetchBudgetByID(uint(request.Id), userID)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, services.ErrBudgetNotFound) {
 			return api.GetBudgetsId404JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    404,
@@ -224,7 +222,7 @@ func (h *budgetsHandler) PatchBudgetsId(ctx context.Context, request api.PatchBu
 		}
 
 		// 予算が見つからない場合
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, services.ErrBudgetNotFound) {
 			return api.PatchBudgetsId404JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    404,
@@ -241,8 +239,8 @@ func (h *budgetsHandler) PatchBudgetsId(ctx context.Context, request api.PatchBu
 			}, nil
 		}
 
-		// 予算が既に存在する場合（ユニーク制約違反）
-		if helpers.IsDuplicateEntry(err) {
+		// 予算が既に存在する場合
+		if errors.Is(err, services.ErrBudgetAlreadyExists) {
 			return api.PatchBudgetsId409JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    409,
@@ -259,8 +257,8 @@ func (h *budgetsHandler) PatchBudgetsId(ctx context.Context, request api.PatchBu
 			}, nil
 		}
 
-		// カテゴリが見つからない場合（外部キー制約違反）
-		if helpers.IsForeignKeyViolation(err) {
+		// カテゴリが見つからない場合
+		if errors.Is(err, services.ErrCategoryNotFound) {
 			return api.PatchBudgetsId400JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    400,
@@ -305,7 +303,7 @@ func (h *budgetsHandler) DeleteBudgetsId(ctx context.Context, request api.Delete
 
 	if err := h.service.DeleteBudget(uint(request.Id), userID); err != nil {
 		// 予算が見つからない場合
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, services.ErrBudgetNotFound) {
 			return api.DeleteBudgetsId404JSONResponse{
 				Error: api.ErrorResponse{
 					Code:    404,

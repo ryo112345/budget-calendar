@@ -2,6 +2,7 @@ package services
 
 import (
 	api "apps/apis"
+	"apps/internal/helpers"
 	"apps/internal/models"
 	"apps/internal/validators"
 
@@ -46,6 +47,9 @@ func (s *budgetService) FetchBudgetByID(id uint, userID uint) (*models.Budget, e
 	var budget models.Budget
 	err := s.db.Preload("Category").Where("id = ? AND user_id = ?", id, userID).First(&budget).Error
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, ErrBudgetNotFound
+		}
 		return nil, err
 	}
 	return &budget, nil
@@ -64,6 +68,12 @@ func (s *budgetService) CreateBudget(userID uint, input *api.CreateBudgetInput) 
 	}
 
 	if err := s.db.Create(&budget).Error; err != nil {
+		if helpers.IsDuplicateEntry(err) {
+			return nil, ErrBudgetAlreadyExists
+		}
+		if helpers.IsForeignKeyViolation(err) {
+			return nil, ErrCategoryNotFound
+		}
 		return nil, err
 	}
 
@@ -83,6 +93,9 @@ func (s *budgetService) UpdateBudget(id uint, userID uint, input *api.UpdateBudg
 	// 予算の存在確認
 	var existing models.Budget
 	if err := s.db.Where("id = ? AND user_id = ?", id, userID).First(&existing).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, ErrBudgetNotFound
+		}
 		return nil, err
 	}
 
@@ -99,6 +112,12 @@ func (s *budgetService) UpdateBudget(id uint, userID uint, input *api.UpdateBudg
 	}
 
 	if err := s.db.Model(&models.Budget{}).Where("id = ? AND user_id = ?", id, userID).Updates(updates).Error; err != nil {
+		if helpers.IsDuplicateEntry(err) {
+			return nil, ErrBudgetAlreadyExists
+		}
+		if helpers.IsForeignKeyViolation(err) {
+			return nil, ErrCategoryNotFound
+		}
 		return nil, err
 	}
 
@@ -116,7 +135,7 @@ func (s *budgetService) DeleteBudget(id uint, userID uint) error {
 		return result.Error
 	}
 	if result.RowsAffected == 0 {
-		return gorm.ErrRecordNotFound
+		return ErrBudgetNotFound
 	}
 	return nil
 }

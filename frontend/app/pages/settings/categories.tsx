@@ -6,8 +6,19 @@ import { CategoryForm } from "~/features/settings/components/CategoryForm";
 import { useCategories } from "~/features/settings/hooks/useCategories";
 
 export default function CategoriesPage() {
-  const { categories, isLoading, editingCategory, isFormOpen, isSaving, isDeleting, openCreateForm, openEditForm, closeForm, handleSubmit, handleDelete } =
-    useCategories();
+  const {
+    categories,
+    isLoading,
+    editingCategory,
+    isFormOpen,
+    isSaving,
+    isDeleting,
+    openCreateForm,
+    openEditForm,
+    closeForm,
+    handleSubmit,
+    handleDelete,
+  } = useCategories();
 
   return (
     <div className='mx-auto max-w-lg space-y-4'>
