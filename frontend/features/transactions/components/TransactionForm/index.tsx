@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { format } from "date-fns";
 import { X } from "lucide-react";
 import type { Transaction, Category, TransactionType, CreateTransactionInput, UpdateTransactionInput } from "~/apis/model";
@@ -36,11 +36,6 @@ export function TransactionForm({ transaction, defaultDate, onSubmit, onDelete, 
   const [description, setDescription] = useState(transaction?.description ?? "");
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (categories.length > 0 && categoryId === "") {
-      setCategoryId(categories[0].id);
-    }
-  }, [categories, categoryId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -143,10 +138,11 @@ export function TransactionForm({ transaction, defaultDate, onSubmit, onDelete, 
             ) : (
               <select
                 value={categoryId}
-                onChange={(e) => setCategoryId(parseInt(e.target.value, 10))}
+                onChange={(e) => setCategoryId(e.target.value ? parseInt(e.target.value, 10) : "")}
                 required
-                className='w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
+                className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${categoryId === "" ? "text-gray-400" : ""}`}
               >
+                <option value="" disabled className="text-gray-400">選択してください</option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}
