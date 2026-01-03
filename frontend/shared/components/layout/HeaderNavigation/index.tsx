@@ -36,7 +36,7 @@ export function HeaderNavigation({ children }: Props) {
             <Link to={NAVIGATION_PAGE_LIST.top}>Budget Calendar</Link>
           </h1>
 
-          {isSignedIn ? (
+          {isSignedIn && (
             // PC用ナビゲーション（md以上で表示）
             <nav className='hidden md:flex items-center space-x-6'>
               {navItems.map((item) => (
@@ -51,16 +51,6 @@ export function HeaderNavigation({ children }: Props) {
                   <span>{item.label}</span>
                 </NavLink>
               ))}
-            </nav>
-          ) : (
-            // 未ログイン時のナビゲーション
-            <nav className='flex items-center space-x-4 text-sm md:text-base'>
-              <Link to={NAVIGATION_PAGE_LIST.signInPage} className='text-gray-600 hover:text-gray-900 transition'>
-                ログイン
-              </Link>
-              <Link to={NAVIGATION_PAGE_LIST.signUpPage} className='text-gray-600 hover:text-gray-900 transition'>
-                会員登録
-              </Link>
             </nav>
           )}
         </div>
