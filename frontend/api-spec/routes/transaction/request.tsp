@@ -8,9 +8,6 @@ model CreateTransactionInput {
   @doc("カテゴリID")
   category_id: int32;
 
-  @doc("取引タイプ（収入/支出）")
-  type: TransactionType;
-
   @doc("金額")
   @minValue(1)
   amount: int32;
@@ -27,9 +24,6 @@ model CreateTransactionInput {
 model UpdateTransactionInput {
   @doc("カテゴリID")
   category_id?: int32;
-
-  @doc("取引タイプ（収入/支出）")
-  type?: TransactionType;
 
   @doc("金額")
   @minValue(1)

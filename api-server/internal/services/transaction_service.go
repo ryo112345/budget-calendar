@@ -37,7 +37,8 @@ func (s *transactionService) FetchTransactions(userID uint, params *api.GetTrans
 			query = query.Where("date <= ?", *params.EndDate)
 		}
 		if params.Type != nil {
-			query = query.Where("type = ?", string(*params.Type))
+			query = query.Joins("JOIN categories ON categories.id = transactions.category_id").
+				Where("categories.type = ?", string(*params.Type))
 		}
 		if params.CategoryId != nil {
 			query = query.Where("category_id = ?", *params.CategoryId)
@@ -70,7 +71,6 @@ func (s *transactionService) CreateTransaction(userID uint, input *api.CreateTra
 	transaction := models.Transaction{
 		UserID:      userID,
 		CategoryID:  uint(input.CategoryId),
-		Type:        models.TransactionType(input.Type),
 		Amount:      int(input.Amount),
 		Date:        input.Date.Time,
 		Description: description,
@@ -101,9 +101,6 @@ func (s *transactionService) UpdateTransaction(id uint, userID uint, input *api.
 
 	if input.CategoryId != nil {
 		updates["category_id"] = *input.CategoryId
-	}
-	if input.Type != nil {
-		updates["type"] = string(*input.Type)
 	}
 	if input.Amount != nil {
 		updates["amount"] = *input.Amount

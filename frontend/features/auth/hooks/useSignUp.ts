@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useRevalidator } from "react-router";
 import { toast } from "sonner";
 import type { UserSignUpInput } from "~/apis/model";
 import { usePostUsersSignUp } from "~/apis/users/users";
@@ -35,12 +35,15 @@ export const useSignUp = () => {
   );
 
   const navigate = useNavigate();
+  const revalidator = useRevalidator();
 
   const { mutate } = usePostUsersSignUp({
     mutation: {
       onSuccess: () => {
+        // loaderを再実行して認証状態を更新
+        revalidator.revalidate();
         toast.success("会員登録が完了しました");
-        navigate(NAVIGATION_PAGE_LIST.signInPage);
+        navigate(NAVIGATION_PAGE_LIST.calendarPage);
       },
       onError: (error) => {
         handleMutationError(error, {

@@ -47,6 +47,7 @@ func (s *categoryService) CreateCategory(userID uint, input *api.CreateCategoryI
 	category := models.Category{
 		UserID: userID,
 		Name:   input.Name,
+		Type:   models.CategoryType(input.Type),
 		Color:  input.Color,
 	}
 

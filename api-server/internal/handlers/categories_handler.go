@@ -294,6 +294,7 @@ func toAPICategory(c *models.Category) api.Category {
 		Id:        int32(c.ID),
 		UserId:    int32(c.UserID),
 		Name:      c.Name,
+		Type:      api.CategoryType(c.Type),
 		Color:     c.Color,
 		CreatedAt: c.CreatedAt,
 		UpdatedAt: c.UpdatedAt,

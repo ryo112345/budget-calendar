@@ -14,11 +14,6 @@ func ValidateCreateTransaction(input *api.CreateTransactionInput) error {
 			validation.Min(1).Error("カテゴリIDは1以上で入力してください"),
 		),
 		validation.Field(
-			&input.Type,
-			validation.Required.Error("取引タイプは必須です"),
-			validation.In(api.Income, api.Expense).Error("取引タイプはincomeまたはexpenseを指定してください"),
-		),
-		validation.Field(
 			&input.Amount,
 			validation.Required.Error("金額は必須です"),
 			validation.Min(1).Error("金額は1以上で入力してください"),
@@ -44,7 +39,6 @@ func ValidateCreateTransaction(input *api.CreateTransactionInput) error {
 
 func ValidateUpdateTransaction(input *api.UpdateTransactionInput) error {
 	if input.CategoryId == nil &&
-		input.Type == nil &&
 		input.Amount == nil &&
 		input.Date == nil &&
 		input.Description == nil {
@@ -53,12 +47,6 @@ func ValidateUpdateTransaction(input *api.UpdateTransactionInput) error {
 
 	if input.CategoryId != nil {
 		if err := validation.Validate(*input.CategoryId, validation.Min(1).Error("カテゴリIDは1以上で入力してください")); err != nil {
-			return err
-		}
-	}
-
-	if input.Type != nil {
-		if err := validation.Validate(*input.Type, validation.In(api.Income, api.Expense).Error("取引タイプはincomeまたはexpenseを指定してください")); err != nil {
 			return err
 		}
 	}

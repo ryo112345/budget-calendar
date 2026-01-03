@@ -1,4 +1,5 @@
 import "@typespec/http";
+import "../../models/category.tsp";
 
 using Http;
 
@@ -7,6 +8,9 @@ model CreateCategoryInput {
   @doc("カテゴリ名")
   @maxLength(100)
   name: string;
+
+  @doc("カテゴリタイプ（収入/支出）")
+  type: CategoryType;
 
   @doc("カテゴリの色")
   @maxLength(20)

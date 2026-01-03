@@ -22,7 +22,11 @@ namespace BudgetCalendarService.User {
     @post
     post(
       @body body: SignUpInput
-    ): SuccessResponse<UserSignUpResponse>
+    ): {
+      @statusCode status: 200;
+      @header setCookie?: string;
+      @body body: UserSignUpResponse;
+    }
       | ErrorBadRequestResponse
       | ErrorConflictResponse
       | ErrorInternalServerErrorResponse;

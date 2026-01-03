@@ -2,6 +2,15 @@ import "@typespec/http";
 
 using Http;
 
+@doc("カテゴリタイプ")
+enum CategoryType {
+  @doc("収入")
+  income,
+
+  @doc("支出")
+  expense,
+}
+
 @doc("Category")
 model Category {
   @doc("カテゴリID")
@@ -13,6 +22,9 @@ model Category {
   @doc("カテゴリ名")
   @maxLength(100)
   name: string;
+
+  @doc("カテゴリタイプ（収入/支出）")
+  type: CategoryType;
 
   @doc("カテゴリの色")
   @maxLength(20)

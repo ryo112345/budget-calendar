@@ -14,6 +14,11 @@ func ValidateCreateCategory(input *api.CreateCategoryInput) error {
 			validation.Length(1, 100).Error("カテゴリ名は1〜100文字で入力してください"),
 		),
 		validation.Field(
+			&input.Type,
+			validation.Required.Error("カテゴリタイプは必須です"),
+			validation.In(api.Income, api.Expense).Error("カテゴリタイプはincomeまたはexpenseを指定してください"),
+		),
+		validation.Field(
 			&input.Color,
 			validation.Required.Error("色は必須です"),
 			validation.Length(1, 20).Error("色は1〜20文字で入力してください"),

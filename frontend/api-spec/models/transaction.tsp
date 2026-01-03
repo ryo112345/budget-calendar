@@ -3,15 +3,6 @@ import "./category.tsp";
 
 using Http;
 
-@doc("取引タイプ")
-enum TransactionType {
-  @doc("収入")
-  income,
-
-  @doc("支出")
-  expense,
-}
-
 @doc("Transaction")
 model Transaction {
   @doc("取引ID")
@@ -25,9 +16,6 @@ model Transaction {
 
   @doc("カテゴリ情報")
   category: Category;
-
-  @doc("取引タイプ（収入/支出）")
-  type: TransactionType;
 
   @doc("金額")
   amount: int32;

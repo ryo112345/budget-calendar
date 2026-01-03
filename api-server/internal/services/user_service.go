@@ -21,7 +21,7 @@ var (
 )
 
 type UserService interface {
-	SignUp(input *api.UserSignUpInput) error
+	SignUp(input *api.UserSignUpInput) (string, error)
 	SignIn(input *api.UserSignInInput) (string, error)
 	ExistsUser(id uint) bool
 }
@@ -35,23 +35,23 @@ func NewUserService(db *gorm.DB) UserService {
 }
 
 // SignUp - 会員登録
-func (us *userService) SignUp(input *api.UserSignUpInput) error {
+func (us *userService) SignUp(input *api.UserSignUpInput) (string, error) {
 	// バリデーション
 	if err := validators.ValidateSignUp(input); err != nil {
-		return err
+		return "", err
 	}
 
 	var count int64
 	if err := us.db.Model(&models.User{}).Where("email = ?", input.Email).Count(&count).Error; err != nil {
-		return err
+		return "", err
 	}
 	if count > 0 {
-		return ErrEmailAlreadyExists
+		return "", ErrEmailAlreadyExists
 	}
 
 	hashedPassword, err := us.encryptPassword(input.Password)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	user := models.User{
@@ -61,10 +61,21 @@ func (us *userService) SignUp(input *api.UserSignUpInput) error {
 	}
 
 	if err := us.db.Create(&user).Error; err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	// トークン生成
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": user.ID,
+		"exp":     time.Now().Add(time.Hour * 24).Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_TOKEN_KEY")))
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
 }
 
 // SignIn - ログイン

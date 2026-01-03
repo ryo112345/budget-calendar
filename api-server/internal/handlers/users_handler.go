@@ -35,7 +35,7 @@ func NewUsersHandler(userService services.UserService) UsersHandler {
 
 func (uh *usersHandler) PostUsersSignUp(ctx context.Context, request api.PostUsersSignUpRequestObject) (api.PostUsersSignUpResponseObject, error) {
 	// サービス層でビジネスロジック実行（バリデーション含む）
-	signUpErr := uh.userService.SignUp(request.Body)
+	tokenString, signUpErr := uh.userService.SignUp(request.Body)
 	if signUpErr != nil {
 		// バリデーションエラーの場合
 		metadata := helpers.ValidationErrorToMetadata(signUpErr)
@@ -92,8 +92,32 @@ func (uh *usersHandler) PostUsersSignUp(ctx context.Context, request api.PostUse
 		}, nil
 	}
 
+	var sameSite http.SameSite
+	if os.Getenv("APP_ENV") == "production" {
+		sameSite = http.SameSiteNoneMode
+	} else {
+		sameSite = http.SameSiteDefaultMode
+	}
+
+	// NOTE: Cookieにtokenをセット
+	cookie := &http.Cookie{
+		Name:     "token",
+		Value:    tokenString,
+		MaxAge:   3600 * 24,
+		Path:     "/",
+		Domain:   os.Getenv("API_ORIGIN"),
+		SameSite: sameSite,
+		Secure:   os.Getenv("APP_ENV") == "production",
+		HttpOnly: true,
+	}
+
 	return api.PostUsersSignUp200JSONResponse{
-		Message: "ユーザー登録が完了しました",
+		Body: api.UserUserSignUpResponse{
+			Message: "ユーザー登録が完了しました",
+		},
+		Headers: api.PostUsersSignUp200ResponseHeaders{
+			SetCookie: cookie.String(),
+		},
 	}, nil
 }
 

@@ -310,18 +310,18 @@ func (h *transactionsHandler) DeleteTransactionsId(ctx context.Context, request 
 // toAPITransaction converts models.Transaction to api.Transaction
 func toAPITransaction(t *models.Transaction) api.Transaction {
 	return api.Transaction{
-		Id:          int32(t.ID),
-		UserId:      int32(t.UserID),
-		CategoryId:  int32(t.CategoryID),
+		Id:         int32(t.ID),
+		UserId:     int32(t.UserID),
+		CategoryId: int32(t.CategoryID),
 		Category: api.Category{
 			Id:        int32(t.Category.ID),
 			UserId:    int32(t.Category.UserID),
 			Name:      t.Category.Name,
+			Type:      api.CategoryType(t.Category.Type),
 			Color:     t.Category.Color,
 			CreatedAt: t.Category.CreatedAt,
 			UpdatedAt: t.Category.UpdatedAt,
 		},
-		Type:        api.TransactionType(t.Type),
 		Amount:      int32(t.Amount),
 		Date:        types.Date{Time: t.Date},
 		Description: t.Description,
