@@ -3,10 +3,15 @@ import { TransactionItem } from "../TransactionItem";
 
 type Props = {
   transactions: Transaction[];
+  isLoading?: boolean;
   onEdit?: (id: number) => void;
 };
 
-export function TransactionList({ transactions, onEdit }: Props) {
+export function TransactionList({ transactions, isLoading, onEdit }: Props) {
+  if (isLoading) {
+    return null;
+  }
+
   if (transactions.length === 0) {
     return (
       <div className='py-12 text-center text-gray-500'>

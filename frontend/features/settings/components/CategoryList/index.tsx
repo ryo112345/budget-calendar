@@ -3,12 +3,17 @@ import type { Category } from "~/apis/model";
 
 type Props = {
   categories: Category[];
+  isLoading: boolean;
   isDeleting: boolean;
   onEdit: (category: Category) => void;
   onDelete: (id: number) => void;
 };
 
-export function CategoryList({ categories, isDeleting, onEdit, onDelete }: Props) {
+export function CategoryList({ categories, isLoading, isDeleting, onEdit, onDelete }: Props) {
+  if (isLoading) {
+    return null;
+  }
+
   if (categories.length === 0) {
     return (
       <div className='py-12 text-center text-gray-500'>

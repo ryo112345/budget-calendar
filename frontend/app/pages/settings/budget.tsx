@@ -9,6 +9,7 @@ export default function BudgetPage() {
   const {
     budgets,
     totalBudget,
+    isLoading,
     currentMonthLabel,
     editingBudget,
     isFormOpen,
@@ -66,7 +67,7 @@ export default function BudgetPage() {
 
       {/* Budget list */}
       <div className='bg-white rounded-lg shadow'>
-        <BudgetList budgets={budgets} isDeleting={isDeleting} onEdit={openEditForm} onDelete={handleDelete} />
+        <BudgetList budgets={budgets} isLoading={isLoading} isDeleting={isDeleting} onEdit={openEditForm} onDelete={handleDelete} />
       </div>
 
       <BudgetForm

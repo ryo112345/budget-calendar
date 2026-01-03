@@ -3,15 +3,20 @@ import type { Budget } from "~/apis/model";
 
 type Props = {
   budgets: Budget[];
+  isLoading: boolean;
   isDeleting: boolean;
   onEdit: (budget: Budget) => void;
   onDelete: (id: number) => void;
 };
 
-export function BudgetList({ budgets, isDeleting, onEdit, onDelete }: Props) {
+export function BudgetList({ budgets, isLoading, isDeleting, onEdit, onDelete }: Props) {
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat("ja-JP").format(amount);
   };
+
+  if (isLoading) {
+    return null;
+  }
 
   if (budgets.length === 0) {
     return (

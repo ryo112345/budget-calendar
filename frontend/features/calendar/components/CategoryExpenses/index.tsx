@@ -7,12 +7,21 @@ type CategoryExpense = {
 
 type Props = {
   expenses: CategoryExpense[];
+  isLoading?: boolean;
 };
 
-export function CategoryExpenses({ expenses }: Props) {
+export function CategoryExpenses({ expenses, isLoading }: Props) {
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat("ja-JP").format(amount);
   };
+
+  if (isLoading) {
+    return (
+      <div className='bg-white rounded-lg shadow p-4'>
+        <h3 className='text-sm font-medium text-gray-600 mb-3'>カテゴリ別支出</h3>
+      </div>
+    );
+  }
 
   if (expenses.length === 0) {
     return (

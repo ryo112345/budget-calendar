@@ -19,6 +19,7 @@ export default function CalendarPage() {
     transactions,
     monthlySummary,
     categoryExpenses,
+    isLoading,
     goToPreviousMonth,
     goToNextMonth,
     goToToday,
@@ -118,7 +119,7 @@ export default function CalendarPage() {
             budget={monthlySummary.budget}
             budgetRemaining={monthlySummary.budgetRemaining}
           />
-          <CategoryExpenses expenses={categoryExpenses} />
+          <CategoryExpenses expenses={categoryExpenses} isLoading={isLoading} />
         </div>
       </div>
 

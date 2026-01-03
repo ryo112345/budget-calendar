@@ -6,7 +6,7 @@ import { CategoryForm } from "~/features/settings/components/CategoryForm";
 import { useCategories } from "~/features/settings/hooks/useCategories";
 
 export default function CategoriesPage() {
-  const { categories, editingCategory, isFormOpen, isSaving, isDeleting, openCreateForm, openEditForm, closeForm, handleSubmit, handleDelete } =
+  const { categories, isLoading, editingCategory, isFormOpen, isSaving, isDeleting, openCreateForm, openEditForm, closeForm, handleSubmit, handleDelete } =
     useCategories();
 
   return (
@@ -26,7 +26,7 @@ export default function CategoriesPage() {
       </div>
 
       <div className='bg-white rounded-lg shadow'>
-        <CategoryList categories={categories} isDeleting={isDeleting} onEdit={openEditForm} onDelete={handleDelete} />
+        <CategoryList categories={categories} isLoading={isLoading} isDeleting={isDeleting} onEdit={openEditForm} onDelete={handleDelete} />
       </div>
 
       <CategoryForm category={editingCategory} isOpen={isFormOpen} isSaving={isSaving} onClose={closeForm} onSubmit={handleSubmit} />

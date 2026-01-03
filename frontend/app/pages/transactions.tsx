@@ -9,6 +9,7 @@ export default function TransactionsPage() {
   const {
     currentMonthLabel,
     transactions,
+    isLoading,
     goToPreviousMonth,
     goToNextMonth,
     createTransaction,
@@ -81,7 +82,7 @@ export default function TransactionsPage() {
 
       {/* Transaction list */}
       <div className='bg-white rounded-lg shadow'>
-        <TransactionList transactions={transactions} onEdit={handleEdit} />
+        <TransactionList transactions={transactions} isLoading={isLoading} onEdit={handleEdit} />
       </div>
 
       {/* Transaction form modal */}
