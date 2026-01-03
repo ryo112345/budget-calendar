@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { X } from "lucide-react";
 import type { Transaction, Category, TransactionType, CreateTransactionInput, UpdateTransactionInput } from "~/apis/model";
 import { useGetCategories } from "~/apis/categories/categories";
+import { formatNumberWithCommas, parseFormattedNumber } from "~/shared/lib/format";
 
 type Props = {
   transaction?: Transaction;
@@ -30,11 +31,18 @@ export function TransactionForm({ transaction, defaultDate, onSubmit, onDelete, 
   };
 
   const [type, setType] = useState<TransactionType>(transaction?.type ?? "expense");
-  const [amount, setAmount] = useState(transaction?.amount?.toString() ?? "");
+  const [amount, setAmount] = useState(transaction?.amount ? formatNumberWithCommas(transaction.amount) : "");
   const [categoryId, setCategoryId] = useState<number | "">(transaction?.category_id ?? "");
   const [date, setDate] = useState(getInitialDate());
   const [description, setDescription] = useState(transaction?.description ?? "");
   const [error, setError] = useState("");
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = parseFormattedNumber(e.target.value);
+    if (raw === "" || /^\d+$/.test(raw)) {
+      setAmount(raw === "" ? "" : formatNumberWithCommas(raw));
+    }
+  };
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,7 +54,7 @@ export function TransactionForm({ transaction, defaultDate, onSubmit, onDelete, 
       return;
     }
 
-    const amountValue = parseInt(amount, 10);
+    const amountValue = parseInt(parseFormattedNumber(amount), 10);
     if (isNaN(amountValue) || amountValue <= 0) {
       setError("金額を正しく入力してください");
       return;
@@ -118,11 +126,11 @@ export function TransactionForm({ transaction, defaultDate, onSubmit, onDelete, 
           <div>
             <label className='block text-sm font-medium text-gray-700 mb-1'>金額</label>
             <input
-              type='number'
+              type='text'
+              inputMode='numeric'
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={handleAmountChange}
               placeholder='0'
-              min='1'
               required
               className='w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
             />

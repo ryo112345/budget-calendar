@@ -86,7 +86,12 @@ export function useBudgets() {
   const handleSubmit = useCallback(
     (input: CreateBudgetInput | UpdateBudgetInput) => {
       if (editingBudget) {
-        updateBudget({ id: editingBudget.id, data: input as UpdateBudgetInput });
+        // 編集時は category_id と amount のみ送信（month は除外）
+        const updateData: UpdateBudgetInput = {
+          category_id: input.category_id,
+          amount: input.amount,
+        };
+        updateBudget({ id: editingBudget.id, data: updateData });
       } else {
         createBudget({ data: { ...input, month: yearMonth } as CreateBudgetInput });
       }

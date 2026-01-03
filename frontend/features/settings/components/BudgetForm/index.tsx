@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { useGetCategories } from "~/apis/categories/categories";
 import type { Budget, CreateBudgetInput } from "~/apis/model";
+import { formatNumberWithCommas, parseFormattedNumber } from "~/shared/lib/format";
 
 type Props = {
   budget: Budget | null;
@@ -19,7 +20,7 @@ export function BudgetForm({ budget, isOpen, isSaving, existingCategoryIds, onCl
   const availableCategories = budget ? allCategories : allCategories.filter((cat) => !existingCategoryIds.includes(cat.id));
 
   const [categoryId, setCategoryId] = useState<number | "">(budget?.category_id ?? "");
-  const [amount, setAmount] = useState(budget?.amount?.toString() ?? "");
+  const [amount, setAmount] = useState(budget?.amount ? formatNumberWithCommas(budget.amount) : "");
 
   // フォームが開かれた時のみ初期化
   useEffect(() => {
@@ -27,7 +28,7 @@ export function BudgetForm({ budget, isOpen, isSaving, existingCategoryIds, onCl
 
     if (budget) {
       setCategoryId(budget.category_id);
-      setAmount(budget.amount.toString());
+      setAmount(formatNumberWithCommas(budget.amount));
     } else {
       setCategoryId("");
       setAmount("");
@@ -42,11 +43,18 @@ export function BudgetForm({ budget, isOpen, isSaving, existingCategoryIds, onCl
     }
   }, [isOpen, budget, categoryId, availableCategories]);
 
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = parseFormattedNumber(e.target.value);
+    if (raw === "" || /^\d+$/.test(raw)) {
+      setAmount(raw === "" ? "" : formatNumberWithCommas(raw));
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!categoryId || !amount) return;
 
-    const amountValue = parseInt(amount, 10);
+    const amountValue = parseInt(parseFormattedNumber(amount), 10);
     if (isNaN(amountValue) || amountValue <= 0) return;
 
     onSubmit({
@@ -78,15 +86,18 @@ export function BudgetForm({ budget, isOpen, isSaving, existingCategoryIds, onCl
                 <br />
                 新しいカテゴリを追加するか、既存の予算を編集してください。
               </div>
+            ) : budget ? (
+              <div className='w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-700'>
+                {budget.category.name}
+              </div>
             ) : (
               <select
                 value={categoryId}
                 onChange={(e) => setCategoryId(parseInt(e.target.value, 10))}
-                disabled={!!budget}
                 required
-                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100'
+                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
               >
-                {(budget ? allCategories : availableCategories).map((cat) => (
+                {availableCategories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}
                   </option>
@@ -97,12 +108,12 @@ export function BudgetForm({ budget, isOpen, isSaving, existingCategoryIds, onCl
           <div>
             <label className='block text-sm font-medium text-gray-700 mb-1'>予算額</label>
             <input
-              type='number'
+              type='text'
+              inputMode='numeric'
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={handleAmountChange}
               className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-              placeholder='例: 50000'
-              min='1'
+              placeholder='例: 50,000'
               required
             />
           </div>

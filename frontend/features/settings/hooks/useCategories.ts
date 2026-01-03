@@ -19,10 +19,17 @@ export function useCategories() {
   const { data, isLoading, error } = useGetCategories();
   const categories = data?.categories ?? [];
 
+  // カテゴリ変更時は関連データ（予算・取引）のキャッシュも無効化
+  const invalidateCategoryRelatedQueries = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: getGetCategoriesQueryKey() });
+    queryClient.invalidateQueries({ queryKey: ["/budgets"] });
+    queryClient.invalidateQueries({ queryKey: ["/transactions"] });
+  }, [queryClient]);
+
   const { mutate: createCategory, isPending: isCreating } = usePostCategories({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getGetCategoriesQueryKey() });
+        invalidateCategoryRelatedQueries();
         toast.success("カテゴリを作成しました");
         closeForm();
       },
@@ -35,7 +42,7 @@ export function useCategories() {
   const { mutate: updateCategory, isPending: isUpdating } = usePatchCategoriesId({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getGetCategoriesQueryKey() });
+        invalidateCategoryRelatedQueries();
         toast.success("カテゴリを更新しました");
         closeForm();
       },
@@ -48,7 +55,7 @@ export function useCategories() {
   const { mutate: deleteCategory, isPending: isDeleting } = useDeleteCategoriesId({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getGetCategoriesQueryKey() });
+        invalidateCategoryRelatedQueries();
         toast.success("カテゴリを削除しました");
       },
       onError: (error) => {

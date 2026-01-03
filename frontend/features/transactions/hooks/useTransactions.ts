@@ -56,10 +56,9 @@ export function useTransactions() {
   }, [data]);
 
   const invalidateTransactions = useCallback(() => {
-    queryClient.invalidateQueries({
-      queryKey: getGetTransactionsQueryKey({ start_date: format(startDate, "yyyy-MM-dd"), end_date: format(endDate, "yyyy-MM-dd") }),
-    });
-  }, [queryClient, startDate, endDate]);
+    // すべての取引クエリを無効化（他のページのキャッシュも含む）
+    queryClient.invalidateQueries({ queryKey: ["/transactions"] });
+  }, [queryClient]);
 
   const createMutation = usePostTransactions({
     mutation: {
