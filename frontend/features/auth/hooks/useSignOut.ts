@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { useNavigate, useRevalidator } from "react-router";
+import { toast } from "sonner";
 import { customFetch } from "~/shared/lib/fetch";
 import { NAVIGATION_PAGE_LIST } from "~/app/routes";
 import { useAuth } from "./useAuth";
@@ -31,6 +32,8 @@ export function useSignOut() {
 
     // Redirect to sign-in page
     navigate(NAVIGATION_PAGE_LIST.signInPage, { replace: true });
+
+    toast.success("ログアウトしました");
   }, [navigate, revalidator, csrfToken]);
 
   return { signOut, isLoading };
