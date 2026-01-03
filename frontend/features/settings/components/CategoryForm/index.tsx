@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
-import type { Category, CreateCategoryInput } from "~/apis/model";
+import type { Category, CreateCategoryInput, UpdateCategoryInput, CategoryType } from "~/apis/model";
 
 type Props = {
   category: Category | null;
   isOpen: boolean;
   isSaving: boolean;
   onClose: () => void;
-  onSubmit: (input: CreateCategoryInput) => void;
+  onSubmit: (input: CreateCategoryInput | UpdateCategoryInput) => void;
 };
 
 const COLOR_OPTIONS = [
@@ -34,15 +34,19 @@ const COLOR_OPTIONS = [
 ];
 
 export function CategoryForm({ category, isOpen, isSaving, onClose, onSubmit }: Props) {
+  const isEditing = !!category;
   const [name, setName] = useState("");
+  const [type, setType] = useState<CategoryType>("expense");
   const [color, setColor] = useState(COLOR_OPTIONS[0].value);
 
   useEffect(() => {
     if (category) {
       setName(category.name);
+      setType(category.type);
       setColor(category.color);
     } else {
       setName("");
+      setType("expense");
       setColor(COLOR_OPTIONS[0].value);
     }
   }, [category, isOpen]);
@@ -50,7 +54,12 @@ export function CategoryForm({ category, isOpen, isSaving, onClose, onSubmit }: 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    onSubmit({ name: name.trim(), color });
+    // 編集時はtypeを送信しない（サーバー側で更新不可のため）
+    if (isEditing) {
+      onSubmit({ name: name.trim(), color });
+    } else {
+      onSubmit({ name: name.trim(), type, color });
+    }
   };
 
   if (!isOpen) return null;
@@ -65,6 +74,32 @@ export function CategoryForm({ category, isOpen, isSaving, onClose, onSubmit }: 
           </button>
         </div>
         <form onSubmit={handleSubmit} className='p-4 space-y-4'>
+          {/* Type selector - 編集時は変更不可 */}
+          <div className='flex gap-2'>
+            <button
+              type='button'
+              onClick={() => !isEditing && setType("expense")}
+              disabled={isEditing}
+              className={`flex-1 py-2 rounded-lg font-medium transition ${
+                type === "expense" ? "bg-red-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              } ${isEditing ? "opacity-60 cursor-not-allowed" : ""}`}
+            >
+              支出
+            </button>
+            <button
+              type='button'
+              onClick={() => !isEditing && setType("income")}
+              disabled={isEditing}
+              className={`flex-1 py-2 rounded-lg font-medium transition ${
+                type === "income" ? "bg-green-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              } ${isEditing ? "opacity-60 cursor-not-allowed" : ""}`}
+            >
+              収入
+            </button>
+          </div>
+          {isEditing && (
+            <p className='text-xs text-gray-500'>※カテゴリタイプは変更できません</p>
+          )}
           <div>
             <label className='block text-sm font-medium text-gray-700 mb-1'>カテゴリ名</label>
             <input

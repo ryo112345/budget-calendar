@@ -8,6 +8,7 @@
 
 export * from "./budget";
 export * from "./category";
+export * from "./categoryType";
 export * from "./createBudgetInput";
 export * from "./createBudgetResponse";
 export * from "./createCategoryInput";
@@ -31,7 +32,6 @@ export * from "./fetchTransactionResponse";
 export * from "./getBudgetsParams";
 export * from "./getTransactionsParams";
 export * from "./transaction";
-export * from "./transactionType";
 export * from "./updateBudgetInput";
 export * from "./updateBudgetResponse";
 export * from "./updateCategoryInput";
@@ -42,4 +42,5 @@ export * from "./userSignInInput";
 export * from "./userSignUpInput";
 export * from "./userUserCheckSignedInResponse";
 export * from "./userUserSignInResponse";
+export * from "./userUserSignOutResponse";
 export * from "./userUserSignUpResponse";

@@ -7,7 +7,7 @@ type Props = {
 };
 
 export function TransactionItem({ transaction, onEdit }: Props) {
-  const isIncome = transaction.type === "income";
+  const isIncome = transaction.category?.type === "income";
 
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat("ja-JP").format(amount);

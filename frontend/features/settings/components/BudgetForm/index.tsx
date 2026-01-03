@@ -16,8 +16,10 @@ type Props = {
 export function BudgetForm({ budget, isOpen, isSaving, existingCategoryIds, onClose, onSubmit }: Props) {
   const { data: categoriesData, isLoading: isCategoriesLoading } = useGetCategories();
   const allCategories = categoriesData?.categories ?? [];
+  // 支出カテゴリのみを対象にする（予算は支出に対して設定するため）
+  const expenseCategories = allCategories.filter((cat) => cat.type === "expense");
 
-  const availableCategories = budget ? allCategories : allCategories.filter((cat) => !existingCategoryIds.includes(cat.id));
+  const availableCategories = budget ? expenseCategories : expenseCategories.filter((cat) => !existingCategoryIds.includes(cat.id));
 
   const [categoryId, setCategoryId] = useState<number | "">(budget?.category_id ?? "");
   const [amount, setAmount] = useState(budget?.amount ? formatNumberWithCommas(budget.amount) : "");

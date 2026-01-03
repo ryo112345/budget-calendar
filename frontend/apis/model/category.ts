@@ -5,6 +5,7 @@
  * Budget Calendar API
  * OpenAPI spec version: 1.0
  */
+import type { CategoryType } from "./categoryType";
 
 /**
  * Category
@@ -19,6 +20,8 @@ export interface Category {
    * @maxLength 100
    */
   name: string;
+  /** カテゴリタイプ（収入/支出） */
+  type: CategoryType;
   /**
    * カテゴリの色
    * @maxLength 20

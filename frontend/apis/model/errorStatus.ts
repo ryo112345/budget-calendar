@@ -14,6 +14,7 @@ export type ErrorStatus = (typeof ErrorStatus)[keyof typeof ErrorStatus];
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ErrorStatus = {
   INVALID_ARGUMENT: "INVALID_ARGUMENT",
+  FAILED_PRECONDITION: "FAILED_PRECONDITION",
   ALREADY_EXISTS: "ALREADY_EXISTS",
   NOT_FOUND: "NOT_FOUND",
   PERMISSION_DENIED: "PERMISSION_DENIED",

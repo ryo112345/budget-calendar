@@ -69,7 +69,7 @@ export function useCalendar() {
       if (!amounts[dateKey]) {
         amounts[dateKey] = { income: 0, expense: 0 };
       }
-      if (tx.type === "income") {
+      if (tx.category?.type === "income") {
         amounts[dateKey].income += tx.amount;
       } else {
         amounts[dateKey].expense += tx.amount;
@@ -102,8 +102,8 @@ export function useCalendar() {
   }, [currentDate]);
 
   const monthlySummary = useMemo(() => {
-    const income = transactions.filter((tx) => tx.type === "income").reduce((sum, tx) => sum + tx.amount, 0);
-    const expense = transactions.filter((tx) => tx.type === "expense").reduce((sum, tx) => sum + tx.amount, 0);
+    const income = transactions.filter((tx) => tx.category?.type === "income").reduce((sum, tx) => sum + tx.amount, 0);
+    const expense = transactions.filter((tx) => tx.category?.type === "expense").reduce((sum, tx) => sum + tx.amount, 0);
     const budget = budgets.reduce((sum, b) => sum + b.amount, 0);
     const budgetRemaining = budget > 0 ? budget - expense : undefined;
 
@@ -113,7 +113,7 @@ export function useCalendar() {
   const categoryExpenses = useMemo(() => {
     const expenseMap = new Map<number, { categoryName: string; amount: number }>();
 
-    for (const tx of transactions.filter((tx) => tx.type === "expense")) {
+    for (const tx of transactions.filter((tx) => tx.category?.type === "expense")) {
       const existing = expenseMap.get(tx.category_id);
       if (existing) {
         existing.amount += tx.amount;

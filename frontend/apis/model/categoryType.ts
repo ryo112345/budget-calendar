@@ -7,12 +7,12 @@
  */
 
 /**
- * 取引タイプ
+ * カテゴリタイプ
  */
-export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType];
+export type CategoryType = (typeof CategoryType)[keyof typeof CategoryType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const TransactionType = {
+export const CategoryType = {
   income: "income",
   expense: "expense",
 } as const;

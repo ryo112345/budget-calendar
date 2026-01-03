@@ -16,8 +16,8 @@ export function DayDetail({ date, transactions, onClose, onAddTransaction, onEdi
     return new Intl.NumberFormat("ja-JP").format(amount);
   };
 
-  const income = transactions.filter((t) => t.type === "income").reduce((sum, t) => sum + t.amount, 0);
-  const expense = transactions.filter((t) => t.type === "expense").reduce((sum, t) => sum + t.amount, 0);
+  const income = transactions.filter((t) => t.category?.type === "income").reduce((sum, t) => sum + t.amount, 0);
+  const expense = transactions.filter((t) => t.category?.type === "expense").reduce((sum, t) => sum + t.amount, 0);
 
   return (
     <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4'>
@@ -65,8 +65,8 @@ export function DayDetail({ date, transactions, onClose, onAddTransaction, onEdi
                       {transaction.description && <div className='text-sm text-gray-500'>{transaction.description}</div>}
                     </div>
                   </div>
-                  <div className={`font-medium ${transaction.type === "income" ? "text-green-600" : "text-red-600"}`}>
-                    {transaction.type === "income" ? "+" : "-"}
+                  <div className={`font-medium ${transaction.category?.type === "income" ? "text-green-600" : "text-red-600"}`}>
+                    {transaction.category?.type === "income" ? "+" : "-"}
                     {formatAmount(transaction.amount)}
                   </div>
                 </button>

@@ -5,7 +5,7 @@
  * Budget Calendar API
  * OpenAPI spec version: 1.0
  */
-import type { TransactionType } from "./transactionType";
+import type { CategoryType } from "./categoryType";
 
 export type GetTransactionsParams = {
   /**
@@ -17,9 +17,9 @@ export type GetTransactionsParams = {
    */
   end_date?: string;
   /**
-   * 取引タイプ（income/expense）
+   * カテゴリタイプ（income/expense）
    */
-  type?: TransactionType;
+  type?: CategoryType;
   /**
    * カテゴリID
    */

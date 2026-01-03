@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { X } from "lucide-react";
-import type { Transaction, Category, TransactionType, CreateTransactionInput, UpdateTransactionInput } from "~/apis/model";
+import type { Transaction, CategoryType, CreateTransactionInput, UpdateTransactionInput } from "~/apis/model";
 import { useGetCategories } from "~/apis/categories/categories";
 import { formatNumberWithCommas, parseFormattedNumber } from "~/shared/lib/format";
 
@@ -18,7 +18,7 @@ type Props = {
 export function TransactionForm({ transaction, defaultDate, onSubmit, onDelete, onClose, isSubmitting, isDeleting }: Props) {
   const isEditing = !!transaction;
   const { data: categoriesData, isLoading: isCategoriesLoading } = useGetCategories();
-  const categories = categoriesData?.categories ?? [];
+  const allCategories = categoriesData?.categories ?? [];
 
   const getInitialDate = () => {
     if (transaction?.date) {
@@ -30,12 +30,24 @@ export function TransactionForm({ transaction, defaultDate, onSubmit, onDelete, 
     return format(new Date(), "yyyy-MM-dd");
   };
 
-  const [type, setType] = useState<TransactionType>(transaction?.type ?? "expense");
+  const [type, setType] = useState<CategoryType>(transaction?.category?.type ?? "expense");
   const [amount, setAmount] = useState(transaction?.amount ? formatNumberWithCommas(transaction.amount) : "");
   const [categoryId, setCategoryId] = useState<number | "">(transaction?.category_id ?? "");
   const [date, setDate] = useState(getInitialDate());
   const [description, setDescription] = useState(transaction?.description ?? "");
   const [error, setError] = useState("");
+
+  const categories = allCategories.filter((cat) => cat.type === type);
+
+  // type切り替え時にカテゴリ選択をリセット
+  useEffect(() => {
+    if (categoryId !== "") {
+      const selectedCategory = allCategories.find((cat) => cat.id === categoryId);
+      if (selectedCategory && selectedCategory.type !== type) {
+        setCategoryId("");
+      }
+    }
+  }, [type, allCategories, categoryId]);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = parseFormattedNumber(e.target.value);
@@ -62,7 +74,6 @@ export function TransactionForm({ transaction, defaultDate, onSubmit, onDelete, 
 
     try {
       const data = {
-        type,
         amount: amountValue,
         category_id: categoryId,
         date,

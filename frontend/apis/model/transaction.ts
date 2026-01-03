@@ -6,7 +6,6 @@
  * OpenAPI spec version: 1.0
  */
 import type { Category } from "./category";
-import type { TransactionType } from "./transactionType";
 
 /**
  * Transaction
@@ -20,8 +19,6 @@ export interface Transaction {
   category_id: number;
   /** カテゴリ情報 */
   category: Category;
-  /** 取引タイプ（収入/支出） */
-  type: TransactionType;
   /** 金額 */
   amount: number;
   /** 取引日 */

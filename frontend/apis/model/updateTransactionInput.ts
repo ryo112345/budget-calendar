@@ -5,7 +5,6 @@
  * Budget Calendar API
  * OpenAPI spec version: 1.0
  */
-import type { TransactionType } from "./transactionType";
 
 /**
  * Update Transaction Input (partial update)
@@ -13,8 +12,6 @@ import type { TransactionType } from "./transactionType";
 export interface UpdateTransactionInput {
   /** カテゴリID */
   category_id?: number;
-  /** 取引タイプ（収入/支出） */
-  type?: TransactionType;
   /**
    * 金額
    * @minimum 1

@@ -27,6 +27,7 @@ import type {
   UserSignUpInput,
   UserUserCheckSignedInResponse,
   UserUserSignInResponse,
+  UserUserSignOutResponse,
   UserUserSignUpResponse,
 } from ".././model";
 
@@ -173,6 +174,57 @@ export const usePostUsersSignIn = <TError = ErrorBody | ErrorBody | ErrorBody, T
   queryClient?: QueryClient,
 ): UseMutationResult<Awaited<ReturnType<typeof postUsersSignIn>>, TError, { data: UserSignInInput }, TContext> => {
   const mutationOptions = getPostUsersSignInMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+/**
+ * ユーザーログアウト
+ * @summary User SignOut
+ */
+export const getPostUsersSignOutUrl = () => {
+  return `/users/signOut`;
+};
+
+export const postUsersSignOut = async (options?: RequestInit): Promise<UserUserSignOutResponse> => {
+  return customFetch<UserUserSignOutResponse>(getPostUsersSignOutUrl(), {
+    ...options,
+    method: "POST",
+  });
+};
+
+export const getPostUsersSignOutMutationOptions = <TError = ErrorBody, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof postUsersSignOut>>, TError, void, TContext>;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<Awaited<ReturnType<typeof postUsersSignOut>>, TError, void, TContext> => {
+  const mutationKey = ["postUsersSignOut"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof postUsersSignOut>>, void> = () => {
+    return postUsersSignOut(requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostUsersSignOutMutationResult = NonNullable<Awaited<ReturnType<typeof postUsersSignOut>>>;
+
+export type PostUsersSignOutMutationError = ErrorBody;
+
+/**
+ * @summary User SignOut
+ */
+export const usePostUsersSignOut = <TError = ErrorBody, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof postUsersSignOut>>, TError, void, TContext>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<Awaited<ReturnType<typeof postUsersSignOut>>, TError, void, TContext> => {
+  const mutationOptions = getPostUsersSignOutMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
