@@ -1,12 +1,12 @@
 package services
 
 import (
-	api "apps/apis"
-	"apps/internal/helpers"
-	"apps/internal/models"
-	"apps/internal/validators"
+	"errors"
 
-	"gorm.io/gorm"
+	api "apps/apis"
+	"apps/internal/models"
+	"apps/internal/repositories"
+	"apps/internal/validators"
 )
 
 type CategoryService interface {
@@ -18,29 +18,26 @@ type CategoryService interface {
 }
 
 type categoryService struct {
-	db *gorm.DB
+	repo repositories.CategoryRepository
 }
 
-func NewCategoryService(db *gorm.DB) CategoryService {
-	return &categoryService{db}
+func NewCategoryService(repo repositories.CategoryRepository) CategoryService {
+	return &categoryService{repo}
 }
 
 func (s *categoryService) FetchCategoriesByUserID(userID uint) ([]models.Category, error) {
-	var categories []models.Category
-	err := s.db.Where("user_id = ?", userID).Find(&categories).Error
-	return categories, err
+	return s.repo.FindAllByUserID(userID)
 }
 
 func (s *categoryService) FetchCategoryByID(id uint, userID uint) (*models.Category, error) {
-	var category models.Category
-	err := s.db.Where("id = ? AND user_id = ?", id, userID).First(&category).Error
+	category, err := s.repo.FindByID(id, userID)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, repositories.ErrNotFound) {
 			return nil, ErrCategoryNotFound
 		}
 		return nil, err
 	}
-	return &category, nil
+	return category, nil
 }
 
 func (s *categoryService) CreateCategory(userID uint, input *api.CreateCategoryInput) (*models.Category, error) {
@@ -55,7 +52,7 @@ func (s *categoryService) CreateCategory(userID uint, input *api.CreateCategoryI
 		Color:  input.Color,
 	}
 
-	if err := s.db.Create(&category).Error; err != nil {
+	if err := s.repo.Create(&category); err != nil {
 		return nil, err
 	}
 
@@ -67,15 +64,6 @@ func (s *categoryService) UpdateCategory(id uint, userID uint, input *api.Update
 		return nil, err
 	}
 
-	// カテゴリの存在確認
-	var existing models.Category
-	if err := s.db.Where("id = ? AND user_id = ?", id, userID).First(&existing).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, ErrCategoryNotFound
-		}
-		return nil, err
-	}
-
 	updates := make(map[string]interface{})
 	if input.Name != nil {
 		updates["name"] = *input.Name
@@ -84,28 +72,27 @@ func (s *categoryService) UpdateCategory(id uint, userID uint, input *api.Update
 		updates["color"] = *input.Color
 	}
 
-	if err := s.db.Model(&models.Category{}).Where("id = ? AND user_id = ?", id, userID).Updates(updates).Error; err != nil {
+	category, err := s.repo.Update(id, userID, updates)
+	if err != nil {
+		if errors.Is(err, repositories.ErrNotFound) {
+			return nil, ErrCategoryNotFound
+		}
 		return nil, err
 	}
 
-	var category models.Category
-	if err := s.db.Where("id = ? AND user_id = ?", id, userID).First(&category).Error; err != nil {
-		return nil, err
-	}
-
-	return &category, nil
+	return category, nil
 }
 
 func (s *categoryService) DeleteCategory(id uint, userID uint) error {
-	result := s.db.Where("id = ? AND user_id = ?", id, userID).Delete(&models.Category{})
-	if result.Error != nil {
-		if helpers.IsForeignKeyViolation(result.Error) {
+	err := s.repo.Delete(id, userID)
+	if err != nil {
+		if errors.Is(err, repositories.ErrNotFound) {
+			return ErrCategoryNotFound
+		}
+		if errors.Is(err, repositories.ErrForeignKeyViolation) {
 			return ErrCategoryInUse
 		}
-		return result.Error
-	}
-	if result.RowsAffected == 0 {
-		return ErrCategoryNotFound
+		return err
 	}
 	return nil
 }

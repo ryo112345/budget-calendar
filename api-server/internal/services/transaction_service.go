@@ -1,12 +1,12 @@
 package services
 
 import (
-	api "apps/apis"
-	"apps/internal/helpers"
-	"apps/internal/models"
-	"apps/internal/validators"
+	"errors"
 
-	"gorm.io/gorm"
+	api "apps/apis"
+	"apps/internal/models"
+	"apps/internal/repositories"
+	"apps/internal/validators"
 )
 
 type TransactionService interface {
@@ -18,48 +18,40 @@ type TransactionService interface {
 }
 
 type transactionService struct {
-	db *gorm.DB
+	repo repositories.TransactionRepository
 }
 
-func NewTransactionService(db *gorm.DB) TransactionService {
-	return &transactionService{db}
+func NewTransactionService(repo repositories.TransactionRepository) TransactionService {
+	return &transactionService{repo}
 }
 
 func (s *transactionService) FetchTransactions(userID uint, params *api.GetTransactionsParams) ([]models.Transaction, error) {
-	var transactions []models.Transaction
-
-	query := s.db.Preload("Category").Where("user_id = ?", userID)
+	var repoParams *repositories.TransactionFindParams
 
 	if params != nil {
-		if params.StartDate != nil {
-			query = query.Where("date >= ?", *params.StartDate)
-		}
-		if params.EndDate != nil {
-			query = query.Where("date <= ?", *params.EndDate)
+		repoParams = &repositories.TransactionFindParams{
+			StartDate:  params.StartDate,
+			EndDate:    params.EndDate,
+			CategoryID: params.CategoryId,
 		}
 		if params.Type != nil {
-			query = query.Joins("JOIN categories ON categories.id = transactions.category_id").
-				Where("categories.type = ?", string(*params.Type))
-		}
-		if params.CategoryId != nil {
-			query = query.Where("category_id = ?", *params.CategoryId)
+			typeStr := string(*params.Type)
+			repoParams.Type = &typeStr
 		}
 	}
 
-	err := query.Order("date DESC").Find(&transactions).Error
-	return transactions, err
+	return s.repo.FindAll(userID, repoParams)
 }
 
 func (s *transactionService) FetchTransactionByID(id uint, userID uint) (*models.Transaction, error) {
-	var transaction models.Transaction
-	err := s.db.Preload("Category").Where("id = ? AND user_id = ?", id, userID).First(&transaction).Error
+	transaction, err := s.repo.FindByID(id, userID)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, repositories.ErrNotFound) {
 			return nil, ErrTransactionNotFound
 		}
 		return nil, err
 	}
-	return &transaction, nil
+	return transaction, nil
 }
 
 func (s *transactionService) CreateTransaction(userID uint, input *api.CreateTransactionInput) (*models.Transaction, error) {
@@ -80,14 +72,10 @@ func (s *transactionService) CreateTransaction(userID uint, input *api.CreateTra
 		Description: description,
 	}
 
-	if err := s.db.Create(&transaction).Error; err != nil {
-		if helpers.IsForeignKeyViolation(err) {
+	if err := s.repo.Create(&transaction); err != nil {
+		if errors.Is(err, repositories.ErrForeignKeyViolation) {
 			return nil, ErrCategoryNotFound
 		}
-		return nil, err
-	}
-
-	if err := s.db.Preload("Category").First(&transaction, transaction.ID).Error; err != nil {
 		return nil, err
 	}
 
@@ -96,14 +84,6 @@ func (s *transactionService) CreateTransaction(userID uint, input *api.CreateTra
 
 func (s *transactionService) UpdateTransaction(id uint, userID uint, input *api.UpdateTransactionInput) (*models.Transaction, error) {
 	if err := validators.ValidateUpdateTransaction(input); err != nil {
-		return nil, err
-	}
-
-	var existing models.Transaction
-	if err := s.db.Where("id = ? AND user_id = ?", id, userID).First(&existing).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, ErrTransactionNotFound
-		}
 		return nil, err
 	}
 
@@ -122,28 +102,27 @@ func (s *transactionService) UpdateTransaction(id uint, userID uint, input *api.
 		updates["description"] = *input.Description
 	}
 
-	if err := s.db.Model(&models.Transaction{}).Where("id = ? AND user_id = ?", id, userID).Updates(updates).Error; err != nil {
-		if helpers.IsForeignKeyViolation(err) {
+	transaction, err := s.repo.Update(id, userID, updates)
+	if err != nil {
+		if errors.Is(err, repositories.ErrNotFound) {
+			return nil, ErrTransactionNotFound
+		}
+		if errors.Is(err, repositories.ErrForeignKeyViolation) {
 			return nil, ErrCategoryNotFound
 		}
 		return nil, err
 	}
 
-	var transaction models.Transaction
-	if err := s.db.Preload("Category").Where("id = ? AND user_id = ?", id, userID).First(&transaction).Error; err != nil {
-		return nil, err
-	}
-
-	return &transaction, nil
+	return transaction, nil
 }
 
 func (s *transactionService) DeleteTransaction(id uint, userID uint) error {
-	result := s.db.Where("id = ? AND user_id = ?", id, userID).Delete(&models.Transaction{})
-	if result.Error != nil {
-		return result.Error
-	}
-	if result.RowsAffected == 0 {
-		return ErrTransactionNotFound
+	err := s.repo.Delete(id, userID)
+	if err != nil {
+		if errors.Is(err, repositories.ErrNotFound) {
+			return ErrTransactionNotFound
+		}
+		return err
 	}
 	return nil
 }

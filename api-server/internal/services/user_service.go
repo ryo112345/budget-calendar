@@ -8,11 +8,11 @@ import (
 
 	api "apps/apis"
 	"apps/internal/models"
+	"apps/internal/repositories"
 	"apps/internal/validators"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 type UserService interface {
@@ -22,11 +22,11 @@ type UserService interface {
 }
 
 type userService struct {
-	db *gorm.DB
+	repo repositories.UserRepository
 }
 
-func NewUserService(db *gorm.DB) UserService {
-	return &userService{db: db}
+func NewUserService(repo repositories.UserRepository) UserService {
+	return &userService{repo: repo}
 }
 
 // SignUp - 会員登録
@@ -36,11 +36,11 @@ func (us *userService) SignUp(input *api.UserSignUpInput) (string, error) {
 		return "", err
 	}
 
-	var count int64
-	if err := us.db.Model(&models.User{}).Where("email = ?", input.Email).Count(&count).Error; err != nil {
+	exists, err := us.repo.ExistsByEmail(input.Email)
+	if err != nil {
 		return "", err
 	}
-	if count > 0 {
+	if exists {
 		return "", ErrEmailAlreadyExists
 	}
 
@@ -55,7 +55,7 @@ func (us *userService) SignUp(input *api.UserSignUpInput) (string, error) {
 		Password: hashedPassword,
 	}
 
-	if err := us.db.Create(&user).Error; err != nil {
+	if err := us.repo.Create(&user); err != nil {
 		return "", err
 	}
 
@@ -80,9 +80,9 @@ func (us *userService) SignIn(input *api.UserSignInInput) (string, error) {
 		return "", err
 	}
 
-	var user models.User
-	if err := us.db.Where("email = ?", input.Email).First(&user).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+	user, err := us.repo.FindByEmail(input.Email)
+	if err != nil {
+		if errors.Is(err, repositories.ErrNotFound) {
 			return "", ErrAuthenticationFailed
 		}
 		return "", err
@@ -106,9 +106,8 @@ func (us *userService) SignIn(input *api.UserSignInInput) (string, error) {
 }
 
 func (us *userService) ExistsUser(id uint) bool {
-	var count int64
-	us.db.Model(&models.User{}).Where("id = ?", id).Count(&count)
-	return count > 0
+	exists, _ := us.repo.ExistsByID(id)
+	return exists
 }
 
 func (us *userService) encryptPassword(password string) (string, error) {

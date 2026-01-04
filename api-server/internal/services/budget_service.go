@@ -1,12 +1,12 @@
 package services
 
 import (
-	api "apps/apis"
-	"apps/internal/helpers"
-	"apps/internal/models"
-	"apps/internal/validators"
+	"errors"
 
-	"gorm.io/gorm"
+	api "apps/apis"
+	"apps/internal/models"
+	"apps/internal/repositories"
+	"apps/internal/validators"
 )
 
 type BudgetService interface {
@@ -18,41 +18,34 @@ type BudgetService interface {
 }
 
 type budgetService struct {
-	db *gorm.DB
+	repo repositories.BudgetRepository
 }
 
-func NewBudgetService(db *gorm.DB) BudgetService {
-	return &budgetService{db}
+func NewBudgetService(repo repositories.BudgetRepository) BudgetService {
+	return &budgetService{repo}
 }
 
 func (s *budgetService) FetchBudgets(userID uint, params *api.GetBudgetsParams) ([]models.Budget, error) {
-	var budgets []models.Budget
-
-	query := s.db.Preload("Category").Where("user_id = ?", userID)
+	var month *string
+	var categoryID *int32
 
 	if params != nil {
-		if params.Month != nil {
-			query = query.Where("month = ?", *params.Month)
-		}
-		if params.CategoryId != nil {
-			query = query.Where("category_id = ?", *params.CategoryId)
-		}
+		month = params.Month
+		categoryID = params.CategoryId
 	}
 
-	err := query.Order("month DESC, category_id ASC").Find(&budgets).Error
-	return budgets, err
+	return s.repo.FindAll(userID, month, categoryID)
 }
 
 func (s *budgetService) FetchBudgetByID(id uint, userID uint) (*models.Budget, error) {
-	var budget models.Budget
-	err := s.db.Preload("Category").Where("id = ? AND user_id = ?", id, userID).First(&budget).Error
+	budget, err := s.repo.FindByID(id, userID)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, repositories.ErrNotFound) {
 			return nil, ErrBudgetNotFound
 		}
 		return nil, err
 	}
-	return &budget, nil
+	return budget, nil
 }
 
 func (s *budgetService) CreateBudget(userID uint, input *api.CreateBudgetInput) (*models.Budget, error) {
@@ -67,18 +60,13 @@ func (s *budgetService) CreateBudget(userID uint, input *api.CreateBudgetInput) 
 		Month:      input.Month,
 	}
 
-	if err := s.db.Create(&budget).Error; err != nil {
-		if helpers.IsDuplicateEntry(err) {
+	if err := s.repo.Create(&budget); err != nil {
+		if errors.Is(err, repositories.ErrDuplicateEntry) {
 			return nil, ErrBudgetAlreadyExists
 		}
-		if helpers.IsForeignKeyViolation(err) {
+		if errors.Is(err, repositories.ErrForeignKeyViolation) {
 			return nil, ErrCategoryNotFound
 		}
-		return nil, err
-	}
-
-	// Categoryをプリロードして返す
-	if err := s.db.Preload("Category").First(&budget, budget.ID).Error; err != nil {
 		return nil, err
 	}
 
@@ -87,15 +75,6 @@ func (s *budgetService) CreateBudget(userID uint, input *api.CreateBudgetInput) 
 
 func (s *budgetService) UpdateBudget(id uint, userID uint, input *api.UpdateBudgetInput) (*models.Budget, error) {
 	if err := validators.ValidateUpdateBudget(input); err != nil {
-		return nil, err
-	}
-
-	// 予算の存在確認
-	var existing models.Budget
-	if err := s.db.Where("id = ? AND user_id = ?", id, userID).First(&existing).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, ErrBudgetNotFound
-		}
 		return nil, err
 	}
 
@@ -111,31 +90,30 @@ func (s *budgetService) UpdateBudget(id uint, userID uint, input *api.UpdateBudg
 		updates["month"] = *input.Month
 	}
 
-	if err := s.db.Model(&models.Budget{}).Where("id = ? AND user_id = ?", id, userID).Updates(updates).Error; err != nil {
-		if helpers.IsDuplicateEntry(err) {
+	budget, err := s.repo.Update(id, userID, updates)
+	if err != nil {
+		if errors.Is(err, repositories.ErrNotFound) {
+			return nil, ErrBudgetNotFound
+		}
+		if errors.Is(err, repositories.ErrDuplicateEntry) {
 			return nil, ErrBudgetAlreadyExists
 		}
-		if helpers.IsForeignKeyViolation(err) {
+		if errors.Is(err, repositories.ErrForeignKeyViolation) {
 			return nil, ErrCategoryNotFound
 		}
 		return nil, err
 	}
 
-	var budget models.Budget
-	if err := s.db.Preload("Category").Where("id = ? AND user_id = ?", id, userID).First(&budget).Error; err != nil {
-		return nil, err
-	}
-
-	return &budget, nil
+	return budget, nil
 }
 
 func (s *budgetService) DeleteBudget(id uint, userID uint) error {
-	result := s.db.Where("id = ? AND user_id = ?", id, userID).Delete(&models.Budget{})
-	if result.Error != nil {
-		return result.Error
-	}
-	if result.RowsAffected == 0 {
-		return ErrBudgetNotFound
+	err := s.repo.Delete(id, userID)
+	if err != nil {
+		if errors.Is(err, repositories.ErrNotFound) {
+			return ErrBudgetNotFound
+		}
+		return err
 	}
 	return nil
 }

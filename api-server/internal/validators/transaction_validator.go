@@ -7,59 +7,32 @@ import (
 )
 
 func ValidateCreateTransaction(input *api.CreateTransactionInput) error {
-	err := validation.ValidateStruct(input,
-		validation.Field(
-			&input.CategoryId,
-			validation.Required.Error("カテゴリIDは必須です"),
-			validation.Min(1).Error("カテゴリIDは1以上で入力してください"),
-		),
-		validation.Field(
-			&input.Amount,
+	return validation.ValidateStruct(input,
+		validation.Field(&input.CategoryId, RequiredCategoryID...),
+		validation.Field(&input.Amount,
 			validation.Required.Error("金額は必須です"),
 			validation.Min(1).Error("金額は1以上で入力してください"),
 		),
-		validation.Field(
-			&input.Date,
-			validation.Required.Error("日付は必須です"),
-		),
-	)
-	if err != nil {
-		return err
-	}
-
-	// Descriptionはオプショナルなので別途検証
-	if input.Description != nil {
-		if err := validation.Validate(*input.Description, validation.Length(0, 255).Error("説明は255文字以内で入力してください")); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func ValidateUpdateTransaction(input *api.UpdateTransactionInput) error {
-	return validation.ValidateStruct(input,
-		validation.Field(&input.CategoryId,
-			validation.By(atLeastOneTransactionField(input)),
-			validation.Min(1).Error("カテゴリIDは1以上で入力してください"),
-		),
-		validation.Field(&input.Amount,
-			validation.Min(1).Error("金額は1以上で入力してください"),
-		),
+		validation.Field(&input.Date, validation.Required.Error("日付は必須です")),
 		validation.Field(&input.Description,
+			validation.NilOrNotEmpty.Error("説明を入力する場合は空にしないでください"),
 			validation.Length(0, 255).Error("説明は255文字以内で入力してください"),
 		),
 	)
 }
 
-func atLeastOneTransactionField(input *api.UpdateTransactionInput) validation.RuleFunc {
-	return func(value interface{}) error {
-		if input.CategoryId == nil &&
-			input.Amount == nil &&
-			input.Date == nil &&
-			input.Description == nil {
-			return validation.NewError("no_fields", "更新するフィールドを1つ以上指定してください")
-		}
-		return nil
-	}
+func ValidateUpdateTransaction(input *api.UpdateTransactionInput) error {
+	return validation.ValidateStruct(input,
+		validation.Field(&input.CategoryId,
+			validation.By(atLeastOneField(func() bool {
+				return input.CategoryId != nil || input.Amount != nil || input.Date != nil || input.Description != nil
+			})),
+			OptionalCategoryID,
+		),
+		validation.Field(&input.Amount, validation.Min(1).Error("金額は1以上で入力してください")),
+		validation.Field(&input.Description,
+			validation.NilOrNotEmpty.Error("説明を入力する場合は空にしないでください"),
+			validation.Length(0, 255).Error("説明は255文字以内で入力してください"),
+		),
+	)
 }

@@ -5,6 +5,7 @@ import (
 	"apps/database"
 	"apps/internal/handlers"
 	"apps/internal/middlewares"
+	"apps/internal/repositories"
 	"apps/internal/services"
 	"net/http"
 	"os"
@@ -21,11 +22,17 @@ func main() {
 
 	dbCon := database.Init()
 
+	// NOTE: repository層のインスタンス
+	userRepo := repositories.NewUserRepository(dbCon)
+	categoryRepo := repositories.NewCategoryRepository(dbCon)
+	transactionRepo := repositories.NewTransactionRepository(dbCon)
+	budgetRepo := repositories.NewBudgetRepository(dbCon)
+
 	// NOTE: service層のインスタンス
-	userService := services.NewUserService(dbCon)
-	categoryService := services.NewCategoryService(dbCon)
-	transactionService := services.NewTransactionService(dbCon)
-	budgetService := services.NewBudgetService(dbCon)
+	userService := services.NewUserService(userRepo)
+	categoryService := services.NewCategoryService(categoryRepo)
+	transactionService := services.NewTransactionService(transactionRepo)
+	budgetService := services.NewBudgetService(budgetRepo)
 
 	// NOTE: Handlerのインスタンス
 	csrfHandler := handlers.NewCsrfHandler()
